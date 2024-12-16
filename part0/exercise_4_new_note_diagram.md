@@ -10,22 +10,22 @@ sequenceDiagram
     server-->>browser: Status Code "302 Found", location: /exampleapp/notes
     deactivate server
 
-    Note over browser: Browser requests resource defined <br/> in the header's location
+    Note over browser: Browser requests resource defined <br/> in the "location" response header
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
     activate server
     Note over server: Server handles GET request
     server-->>browser: HTML document
     deactivate server
 
-    Note over browser: Browser parses HTML, requests <br/> resources within <head> of HTML <br/> (main.css, main.js)
+    Note over browser: Browser parses HTML, requests <br/> linked resources (main.css, main.js)
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
     activate server
-    server-->>browser: the css file
+    server-->>browser: main.css file
     deactivate server
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
     activate server
-    server-->>browser: the JavaScript file
+    server-->>browser: main.js file
     deactivate server
 
     Note right of browser: The browser starts executing the JavaScript code that fetches the JSON from the server
