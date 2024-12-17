@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 
 const Statistics = (props) => {
@@ -6,16 +5,22 @@ const Statistics = (props) => {
 
   const average = good - bad;
   const count = good + neutral + bad;
-  const positive = count > 0 ? good / count + "%" : "-";
+  const positive = good / count * 100 + "%";
 
   return (
     <div>
       <h1>Statistics</h1>
-      <p>Good: {good}</p>
-      <p>Neutral: {neutral}</p>
-      <p>Bad: {bad}</p>
-      <p>Average: {average}</p>
-      <p>Positive: {positive}</p>
+      {count > 0 ? (
+        <>
+          <p>Good: {good}</p>
+          <p>Neutral: {neutral}</p>
+          <p>Bad: {bad}</p>
+          <p>Average: {average}</p>
+          <p>Positive: {positive}</p>
+        </>
+      ) : (
+        "No feedback given"
+      )}
     </div>
   );
 };
