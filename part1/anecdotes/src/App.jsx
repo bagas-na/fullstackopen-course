@@ -45,7 +45,7 @@ const App = () => {
   return (
     <>
     <div>
-      <h1>Anectdotes of the day</h1>
+      <h1>Anecdotes of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>
         has {votes[selected]} vote{votes[selected] > 1 ? "s" : ""}
