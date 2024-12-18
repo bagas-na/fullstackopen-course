@@ -1,6 +1,12 @@
 const Header = ({ course }) => <h1>{course}</h1>;
 
-const Total = ({ sum }) => <p>Number of exercises {sum}</p>;
+const Total = ({ sum }) => (
+  <p>
+    <strong>
+      Total of {sum} exercise{Number(sum) > 1 ? "s" : ""}
+    </strong>
+  </p>
+);
 
 const Part = ({ part }) => (
   <p>
@@ -18,11 +24,13 @@ const Content = ({ parts }) => (
 
 const Course = ({ course }) => {
   const { name, parts } = course;
+  const sum = parts.reduce((accumulator, currentValue) => accumulator + currentValue.exercises, 0);
 
   return (
     <div>
       <Header course={name} />
       <Content parts={parts} />
+      <Total sum={sum} />
     </div>
   );
 };
@@ -54,7 +62,7 @@ const App = () => {
       },
       {
         name: "Form validation using zod",
-        exercises: 7,
+        exercises: 17,
         id: 5,
       },
     ],
