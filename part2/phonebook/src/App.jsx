@@ -10,6 +10,12 @@ const App = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    const exist = persons.find((person) => person.name === newName);
+    if (exist !== undefined) {
+      alert(`${newName} is already added to the phonebook`);
+      return;
+    }
+
     setPersons([...persons, { name: newName }]);
   };
 
