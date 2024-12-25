@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { CountriesList, CountryDetail } from "./Country";
+import { CountriesList, CountryDetail } from "./components/Country";
+import { Weather } from "./components/Weather";
 
 const Result = ({ countries }) => {
   if (countries.length === 0) {
@@ -16,7 +17,12 @@ const Result = ({ countries }) => {
   }
 
   if (countries.length === 1) {
-    return CountryDetail({ country: countries[0] });
+    return (
+      <>
+      <CountryDetail country={countries[0]} />
+      <Weather cityName={countries[0].capital} countryCode={countries[0].ccn3} />
+      </>
+    )
   }
 };
 
@@ -28,7 +34,6 @@ const App = () => {
   useEffect(() => {
     fetch(allUrl)
       .then((result) => {
-        console.log(result);
         return result.json();
       })
       .then((json) => {

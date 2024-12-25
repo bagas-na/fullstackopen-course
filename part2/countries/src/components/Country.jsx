@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import Weather from "./Weather";
 
 export const CountryDetail = ({ country }) => {
   const languages = Object.values(country.languages);
@@ -35,13 +36,18 @@ export const Country = ({ country }) => {
   return (
     <div>
       <div>
-        <p style={{display: "inline"}}>{country.name.common} </p>
+        <p style={{ display: "inline" }}>{country.name.common} </p>
         <button type="button" onClick={() => setIsVisible(!isVisible)}>
-        {text}
+          {text}
         </button>
       </div>
       <div>
-        {isVisible && <CountryDetail country={country} />}
+        {isVisible && (
+          <>
+            <CountryDetail country={country} />
+            <Weather cityName={country.capital} countryCode={country.ccn3} />
+          </>
+        )}
       </div>
     </div>
   );
@@ -51,7 +57,9 @@ export const CountriesList = ({ countries }) => {
   return (
     <ul>
       {countries.map((country) => (
-        <li key={country?.ccn3}><Country country={country} /></li>
+        <li key={country?.ccn3}>
+          <Country country={country} />
+        </li>
       ))}
     </ul>
   );
