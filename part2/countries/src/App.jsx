@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
+import { CountriesList, CountryDetail } from "./Country";
 
-const CountryData = ({ countries }) => {
+const Result = ({ countries }) => {
   if (countries.length === 0) {
     return <p>No matches, specify another filter.</p>;
   }
@@ -11,41 +12,11 @@ const CountryData = ({ countries }) => {
   }
 
   if (countries.length > 1) {
-    return (
-      <ul>
-        {countries.map((country) => (
-          <li key={country?.ccn3}>{country.name.common}</li>
-        ))}
-      </ul>
-    );
+    return CountriesList({ countries });
   }
 
   if (countries.length === 1) {
-    const languages = Object.values(countries[0].languages);
-    return (
-      <>
-        <h1>{countries[0].name.common}</h1>
-        <div>
-          <p style={{ margin: "0" }}>capital: {countries[0].capital}</p>
-          <p style={{ margin: "0" }}>area: {countries[0].area}</p>
-        </div>
-        <div>
-          <h3>languages:</h3>
-          <ul>
-            {languages.map((language) => (
-              <li key={language}>{language}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <img
-            src={countries[0].flags.png}
-            alt={`Flag of ${countries[0].name.common}`}
-            style={{ boxShadow: "0px 0px 5px -4px black" }}
-          />
-        </div>
-      </>
-    );
+    return CountryDetail({ country: countries[0] });
   }
 };
 
@@ -82,7 +53,7 @@ const App = () => {
       <div>
         find countries <input type="text" value={query} onChange={searchQueryHandler} autoFocus />
       </div>
-      <CountryData countries={filteredCountries} />
+      <Result countries={filteredCountries} />
     </div>
   );
 };
