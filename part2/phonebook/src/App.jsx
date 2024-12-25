@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import { createPerson, getAllPersons, removePerson } from "./services/persons";
+import { createPerson, getAllPersons, removePerson, updatePerson } from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([{ name: null, number: null, id: 0 }]);
@@ -12,7 +12,6 @@ const App = () => {
 
   useEffect(() => {
     getAllPersons().then((response) => {
-      console.log(response.data);
       setPersons(response.data);
     });
   }, []);
@@ -36,16 +35,31 @@ const App = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    const exist = persons.find((person) => person.name === newName);
-    if (exist !== undefined) {
-      alert(`${newName} is already added to the phonebook`);
+    const foundIndex = persons.findIndex((person) => person.name === newName);
+    if (foundIndex === -1) {
+      createPerson({ name: newName, number: newNumber }).then((response) => {
+        setPersons([...persons, response.data]);
+      });
+
       return;
     }
 
-    createPerson({ name: newName, number: newNumber }).then((response) => {
-      console.log(response.data);
-      setPersons([...persons, response.data]);
+    const replace = confirm(
+      `${persons[foundIndex].name} is already added to phonebook, replace the old number with a new one?`
+    );
+
+    if (!replace) {
+      return;
+    }
+
+    updatePerson(persons[foundIndex].id, { ...persons[foundIndex], number: newNumber }).then((response) => {
+      const newPersons = Array.from(persons);
+      newPersons[foundIndex] = response.data;
+
+      setPersons(newPersons);
     });
+
+    return;
   };
 
   const deletePersonHandler = (id) => {
