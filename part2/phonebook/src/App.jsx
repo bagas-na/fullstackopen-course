@@ -50,8 +50,9 @@ const App = () => {
             setNotificationMessage(null);
           }, 5000);
         })
-        .catch(() => {
-          setNotificationMessage(`Error adding ${newName}`);
+        .catch((error) => {
+          console.log(error.response.data.error)
+          setNotificationMessage(`Error adding ${newName}, ${error.response.data.error}`);
           setIsError(true);
           setTimeout(() => {
             setNotificationMessage(null);
@@ -69,7 +70,7 @@ const App = () => {
       return;
     }
 
-    updatePerson(persons[foundIndex].id, { ...persons[foundIndex], number: newNumber })
+    updatePerson(persons[foundIndex].id, { name: persons[foundIndex].name, number: newNumber })
       .then((response) => {
         const newPersons = Array.from(persons);
         newPersons[foundIndex] = response.data;
@@ -81,8 +82,9 @@ const App = () => {
           setNotificationMessage(null);
         }, 5000);
       })
-      .catch(() => {
-        setNotificationMessage(`Error updating ${newName}`);
+      .catch((error) => {
+        console.log(error.response.data.error)
+        setNotificationMessage(`Error updating ${newName}, ${error.response.data.error}`);
         setIsError(true);
         setTimeout(() => {
           setNotificationMessage(null);
