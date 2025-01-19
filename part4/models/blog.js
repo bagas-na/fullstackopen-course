@@ -8,12 +8,12 @@ const blogSchema = new mongoose.Schema({
   },
   author: {
     type: String,
-    required: true,
+    required: false,
     minLength: 3
   },
   url: {
     type: String,
-    default: (blog) => `/blog/${encodeURI(blog.author.toLowerCase())}-${encodeURI(blog.title.toLowerCase())}`
+    required: true,
   },
   likes: {
     type: Number,

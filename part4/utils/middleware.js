@@ -1,6 +1,12 @@
 const logger = require('./logger')
+const config = require('./config')
 
 const requestLogger = (req, res, next) => {
+  if(config.NODE_ENV === 'test') {
+    next()
+    return;
+  }
+
   logger.info('Method: ', req.method);
   logger.info('Path  : ', req.path);
   logger.info('Body  : ', req.body);
