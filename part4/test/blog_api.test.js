@@ -39,7 +39,7 @@ test('returns correct amount of blog post', async () => {
 test('property "id" exists, and is hexadecimal of length 24', async () => {
   const response = await api.get('/api/blogs')
 
-  response.body.forEach(blog =>{
+  response.body.forEach(blog => {
     assert.match(blog.id, /^[a-f\d]{24}$/i)
   })
 })
@@ -52,7 +52,7 @@ test('create new blog post', async () => {
   }
 
   await api.post('/api/blogs').send(newBlog).expect(201)
-  
+
   const response = await api.get('/api/blogs')
   const length = response.body.length;
   const lastBlog = response.body[length - 1]
@@ -72,7 +72,7 @@ test('default likes is 0', async () => {
   }
 
   await api.post('/api/blogs').send(newBlog).expect(201)
-  
+
   const response = await api.get('/api/blogs')
   const length = response.body.length;
   const lastBlog = response.body[length - 1]
@@ -103,6 +103,59 @@ test('missing title or url result in error 400', async () => {
   await api.post('/api/blogs').send(newBlogNoTitle).expect(400)
   await api.post('/api/blogs').send(newBlogNoAuthor).expect(201)
   await api.post('/api/blogs').send(newBlogNoUrl).expect(400)
+})
+
+test('delete an existing blog', async () => {
+  const currentBlogs = await helper.blogInDb();
+  const deleteBlogId = currentBlogs[0].id;
+
+  const responseBeforeDeletion = await api.get('/api/blogs');
+  assert(responseBeforeDeletion.body.map(blog => blog.id).includes(deleteBlogId))
+
+  await api.delete(`/api/blogs/${deleteBlogId}`).expect(200);
+
+  const response = await api.get('/api/blogs');
+
+  assert.strictEqual(response.body.length, helper.initialBlogs.length - 1)
+  assert(!response.body.map(blog => blog.id).includes(deleteBlogId))
+
+})
+
+
+test('update an existing blog', async () => {
+  const currentBlogs = await helper.blogInDb();
+  const updateBlogId = currentBlogs[0].id;
+
+  const blog = {
+    title: currentBlogs[0].title,
+    author: currentBlogs[0].author,
+    url: currentBlogs[0].url,
+    likes: currentBlogs[0].likes
+  }
+
+  const updateBlogContent = {
+    title: "The C Programming Language (Second Edition)",
+    author: "Brian Kernighan and Dennis Ritchie",
+    url: "https://www.amazon.com/Programming-Language-2nd-Brian-Kernighan/dp/0131103628",
+    likes: blog.likes
+  }
+
+  assert.notStrictEqual(blog.title, updateBlogContent.title)
+  assert.notStrictEqual(blog.author, updateBlogContent.author)
+  assert.notStrictEqual(blog.url, updateBlogContent.url)
+
+  await api.put(`/api/blogs/${updateBlogId}`).send(updateBlogContent).expect(200);
+
+  const response = await api.get('/api/blogs');
+
+  assert.strictEqual(response.body.length, helper.initialBlogs.length - 1);
+
+  const updatedBlog = await Blog.findById(updateBlogId);
+
+  assert.strictEqual(blog.title, updatedBlog.title)
+  assert.strictEqual(blog.author, updatedBlog.author)
+  assert.strictEqual(blog.url, updatedBlog.url)
+
 })
 
 
