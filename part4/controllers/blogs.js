@@ -48,7 +48,7 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 
   try {
     const result = await Blog.findByIdAndDelete(blogId);
-    response.json(result);
+    response.status(200).json(result);
   } catch (error) {
     logger.error(`error deleting blog with id ${blogId} from database.`)
     next(error)
@@ -83,8 +83,8 @@ blogsRouter.put('/:id', async (request, response, next) => {
   }
 
   try {
-    const result = await Blog.findByIdAndUpdate(blogId, updatedBlog, { new: true})
-    res.json(result)
+    const result = await Blog.findByIdAndUpdate(blogId, updatedBlog, { new: true })
+    response.status(200).json(result)
   } catch (error) {
     logger.error('error updating blog to database')
   }

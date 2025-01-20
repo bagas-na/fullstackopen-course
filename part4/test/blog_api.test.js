@@ -140,6 +140,7 @@ test('update an existing blog', async () => {
     likes: blog.likes
   }
 
+  // Entry to be replaced has different content than new content
   assert.notStrictEqual(blog.title, updateBlogContent.title)
   assert.notStrictEqual(blog.author, updateBlogContent.author)
   assert.notStrictEqual(blog.url, updateBlogContent.url)
@@ -148,13 +149,15 @@ test('update an existing blog', async () => {
 
   const response = await api.get('/api/blogs');
 
-  assert.strictEqual(response.body.length, helper.initialBlogs.length - 1);
+  // Blog list length must not change after PUT request
+  assert.strictEqual(response.body.length, helper.initialBlogs.length);
 
   const updatedBlog = await Blog.findById(updateBlogId);
 
-  assert.strictEqual(blog.title, updatedBlog.title)
-  assert.strictEqual(blog.author, updatedBlog.author)
-  assert.strictEqual(blog.url, updatedBlog.url)
+  // Entry with the specific id must have same content as the "new content"
+  assert.strictEqual(updatedBlog.title, updateBlogContent.title)
+  assert.strictEqual(updatedBlog.author, updateBlogContent.author)
+  assert.strictEqual(updatedBlog.url, updateBlogContent.url)
 
 })
 
