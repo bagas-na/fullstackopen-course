@@ -15,7 +15,7 @@ blogsRouter.get('/', async (request, response, next) => {
 blogsRouter.post('/', async (request, response, next) => {
   const contentType = request.get('Content-type')
 
-  if (contentType !== 'application/json') {
+  if (!contentType.includes('application/json')) {
     response.status(415).send({
       error: 'Unsupported Media Type',
       message: `Expected Content-Type: application/json, but received ${contentType}`
@@ -58,7 +58,7 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 blogsRouter.put('/:id', async (request, response, next) => {
   const contentType = request.get('Content-type')
 
-  if (contentType !== 'application/json') {
+  if (!contentType.includes('application/json')) {
     response.status(415).send({
       error: 'Unsupported Media Type',
       message: `Expected Content-Type: application/json, but received ${contentType}`
