@@ -19,7 +19,7 @@ describe('when there is initially one user in db', () => {
       timeCost: 2,
       parallelism: 1
     })
-  
+
     const user = new User({
       username: 'root',
       passwordHash,

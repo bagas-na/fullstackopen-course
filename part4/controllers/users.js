@@ -4,6 +4,8 @@ const argon2 = require('argon2')
 const logger = require('../utils/logger')
 
 usersRouter.post('/', async (request, response) => {
+  const contentType = request.header('Content-Type')
+
   if (!contentType.includes('application/json')) {
     response.status(415).send({
       error: 'Unsupported Media Type',
@@ -11,14 +13,14 @@ usersRouter.post('/', async (request, response) => {
     })
     return
   }
-  
+
   const { username, name, password } = request.body
   if (request.body.username === undefined || request.body.password === undefined) {
     response.status(400).send({
       error: 'Unexpected json format',
       message: 'json must contain entries {username: ..., password: ...}'
     })
-    return;
+    return
   }
 
   const passwordHash = await argon2.hash(password, {
@@ -42,12 +44,12 @@ usersRouter.get('/', async (request, response, next) => {
   try {
     const user = await User.find({})
     const userJSON = user.map(user => user.toJSON())
+    response.status(200).json(userJSON)
   } catch (error) {
     logger.error('error fetching users from database.')
     next(error)
   }
-  
-  response.status(200).json(userJSON)
+
 })
 
 

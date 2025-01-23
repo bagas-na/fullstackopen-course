@@ -6,12 +6,12 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-const {MONGODB_URI} = require('./utils/config')
+const { MONGODB_URI } = require('./utils/config')
 
-mongoose.set("strictQuery", false)
+mongoose.set('strictQuery', false)
 mongoose.connect(MONGODB_URI)
-  .then(result => logger.info("Connected to MongoDB!"))
-  .catch(error => logger.error("Error connecting to MongoDB", error.message))
+  .then(() => logger.info('Connected to MongoDB!'))
+  .catch(error => logger.error('Error connecting to MongoDB', error.message))
 
 app.use(cors())
 // app.use(express.static('dist'))
@@ -24,4 +24,4 @@ app.use('/api/users', usersRouter)
 app.use(middleware.unknownEndpoints)
 app.use(middleware.errorHandler)
 
-module.exports = app;
+module.exports = app

@@ -28,7 +28,7 @@ blogsRouter.post('/', async (request, response, next) => {
       error: 'Unexpected json format',
       message: 'json must contain entries {title: ..., url: ...}'
     })
-    return;
+    return
   }
 
   const blog = new Blog(request.body)
@@ -36,7 +36,7 @@ blogsRouter.post('/', async (request, response, next) => {
   try {
     const result = await blog.save()
     response.status(201).json(result)
-    return;
+    return
   } catch (error) {
     logger.error('error saving blog to database.')
     next(error)
@@ -44,11 +44,11 @@ blogsRouter.post('/', async (request, response, next) => {
 })
 
 blogsRouter.delete('/:id', async (request, response, next) => {
-  const blogId = request.params.id;
+  const blogId = request.params.id
 
   try {
-    const result = await Blog.findByIdAndDelete(blogId);
-    response.status(200).json(result);
+    const result = await Blog.findByIdAndDelete(blogId)
+    response.status(200).json(result)
   } catch (error) {
     logger.error(`error deleting blog with id ${blogId} from database.`)
     next(error)
@@ -71,10 +71,10 @@ blogsRouter.put('/:id', async (request, response, next) => {
       error: 'Unexpected json format',
       message: 'json must contain entries {title: ..., url: ...}'
     })
-    return;
+    return
   }
 
-  const blogId = request.params.id;
+  const blogId = request.params.id
   const updatedBlog = {
     title: request.body.title,
     author: request.body.author,
@@ -87,6 +87,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
     response.status(200).json(result)
   } catch (error) {
     logger.error('error updating blog to database')
+    next(error)
   }
 })
 

@@ -1,5 +1,5 @@
 const dummy = (blogs) => {
-  return 1;
+  return 1
 }
 
 const totalLikes = (blogs) => {
@@ -7,7 +7,7 @@ const totalLikes = (blogs) => {
 }
 
 const favoriteBlog = (blogs) => {
-  if (blogs.length === 0) return { title: '', author: '', likes: 0 };
+  if (blogs.length === 0) return { title: '', author: '', likes: 0 }
 
   const topBlog = blogs.reduce((fav, blog) => blog.likes > fav.likes ? blog : fav, blogs[0])
 
@@ -29,13 +29,13 @@ const mostBlogs = (blogs) => {
     }
   }
 
-  let author = '';
-  let maxFreq = 0;
+  let author = ''
+  let maxFreq = 0
 
   for (const [key, value] of authFreq.entries()) {
     if (value > maxFreq) {
-      author = key;
-      maxFreq = value;
+      author = key
+      maxFreq = value
     }
   }
 
@@ -56,13 +56,13 @@ const mostLikes = (blogs) => {
     }
   }
 
-  let author = '';
-  let maxLikes = 0;
+  let author = ''
+  let maxLikes = 0
 
   for (const [key, value] of authLikes.entries()) {
     if (value > maxLikes) {
-      author = key;
-      maxLikes = value;
+      author = key
+      maxLikes = value
     }
   }
 
