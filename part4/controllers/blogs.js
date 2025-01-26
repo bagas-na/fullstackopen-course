@@ -1,10 +1,11 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const logger = require('../utils/logger')
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs)
   } catch (error) {
     logger.error('error fetching blogs from database.')
@@ -31,12 +32,19 @@ blogsRouter.post('/', async (request, response, next) => {
     return
   }
 
-  const blog = new Blog(request.body)
-
   try {
-    const result = await blog.save()
-    response.status(201).json(result)
-    return
+    const usersDocument = await User.find({})
+    const users = usersDocument.map(user => user.toJSON())
+    const randIndex = Math.floor(Math.random() * users.length) % users.length
+
+    const blog = new Blog({ ...request.body, user: users[randIndex].id })
+    const savedBlog = await blog.save()
+
+    const blogUser = await User.findById(users[randIndex].id)
+    blogUser.blogs = blogUser.blogs.concat(savedBlog.id)
+
+    await blogUser.save()
+    response.status(201).json(savedBlog)
   } catch (error) {
     logger.error('error saving blog to database.')
     next(error)

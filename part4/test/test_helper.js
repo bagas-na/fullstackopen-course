@@ -57,6 +57,16 @@ const initialUsers = [
     username: 'guest',
     name: 'Guest',
     password: 'clandestine'
+  },
+  {
+    username: 'e_dijkstra',
+    name: 'Edsger Dijkstra',
+    password: 'astar'
+  },
+  {
+    username: 'unclebob',
+    name: 'Robert Martin',
+    password: 'agile'
   }
 ]
 
