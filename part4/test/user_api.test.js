@@ -10,22 +10,33 @@ const app = require('../app')
 
 const api = supertest(app)
 
-describe('when there is initially one user in db', () => {
+const createUserPromise = async (username, name, password) => {
+  const passwordHash = await argon2.hash(password, {
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1
+  })
+
+  const user = new User({
+    username,
+    name,
+    passwordHash,
+  })
+
+  return user.save()
+}
+
+describe('when there are initially a few users in db', () => {
   beforeEach(async () => {
-    await User.deleteMany({})
+    try {
+      await User.deleteMany({})
+      const createUserPromisesArray = helper.initialUsers.map(user =>
+        createUserPromise(user.username, user.name, user.password))
 
-    const passwordHash = await argon2.hash('sekret', {
-      memoryCost: 19456,
-      timeCost: 2,
-      parallelism: 1
-    })
-
-    const user = new User({
-      username: 'root',
-      passwordHash,
-    })
-
-    await user.save()
+      await Promise.all(createUserPromisesArray)
+    } catch (error) {
+      console.error('Error populating users database for tests initialization', error.message)
+    }
   })
 
   test('creation succeeds with a fresh username', async () => {
@@ -45,6 +56,28 @@ describe('when there is initially one user in db', () => {
 
     const usersAtEnd = await helper.usersInDb()
     assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    assert(usernames.includes(newUser.username))
+  })
+
+  test('creation fails with a same username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'gatekeeper',
+      name: 'Portinvartija',
+      password: 'himitsu',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
 
     const usernames = usersAtEnd.map(u => u.username)
     assert(usernames.includes(newUser.username))
