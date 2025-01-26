@@ -18,7 +18,7 @@ usersRouter.post('/', async (request, response, next) => {
   if (username === undefined || password === undefined) {
     response.status(400).send({
       error: 'Unexpected json format',
-      message: 'json must contain entries {username: ..., password: ...}'
+      message: 'json must contain entries \'username\' and \'password\''
     })
     return
   }

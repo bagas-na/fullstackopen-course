@@ -54,7 +54,7 @@ const initialUsers = [
     password: 'salainen'
   },
   {
-    usename: 'guest',
+    username: 'guest',
     name: 'Guest',
     password: 'clandestine'
   }
