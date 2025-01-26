@@ -21,7 +21,7 @@ beforeEach(async () => {
     await Promise.all(blogPromiseArray)
 
   } catch (error) {
-    console.error('Error initializing blog api tests', error.message)
+    console.error('Error populating blogs database for tests initialization', error.message)
   }
 })
 
