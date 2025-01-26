@@ -49,7 +49,6 @@ beforeEach(async () => {
     // Use for loop to avoid racing condition in concatenating blogs of the same user
     for (let blog of helper.initialBlogs) {
       const randIndex = Math.floor(Math.random() * users.length) % users.length
-      console.log('userIndex', randIndex)
       const blogObject = new Blog({ ...blog, user: users[randIndex].id })
       const savedBlog = await blogObject.save()
 

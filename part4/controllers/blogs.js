@@ -1,7 +1,9 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
+const config = require('../utils/config')
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
@@ -15,7 +17,6 @@ blogsRouter.get('/', async (request, response, next) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   const contentType = request.get('Content-type')
-
   if (!contentType.includes('application/json')) {
     response.status(415).send({
       error: 'Unsupported Media Type',
@@ -24,23 +25,31 @@ blogsRouter.post('/', async (request, response, next) => {
     return
   }
 
+  if (request.token === null) {
+    response.status(401).json({ error: 'token required' })
+    return
+  }
+
   if (request.body.title === undefined || request.body.url === undefined) {
     response.status(400).send({
       error: 'Unexpected json format',
-      message: 'json must contain entries {title: ..., url: ...}'
+      message: 'json must contain entries \'title\', \'url\'.'
     })
     return
   }
 
   try {
-    const usersDocument = await User.find({})
-    const users = usersDocument.map(user => user.toJSON())
-    const randIndex = Math.floor(Math.random() * users.length) % users.length
+    const decodedToken = jwt.verify(request.token, config.SECRET)
+    if (!decodedToken.id) {
+      response.status(401).json({ error: 'token invalid' })
+      return
+    }
 
-    const blog = new Blog({ ...request.body, user: users[randIndex].id })
+    const user = await User.findById(decodedToken.id)
+    const blog = new Blog({ ...request.body, user: user.id })
     const savedBlog = await blog.save()
 
-    const blogUser = await User.findById(users[randIndex].id)
+    const blogUser = await User.findById(user.id)
     blogUser.blogs = blogUser.blogs.concat(savedBlog.id)
 
     await blogUser.save()
