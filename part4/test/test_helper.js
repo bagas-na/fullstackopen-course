@@ -42,6 +42,24 @@ const initialBlogs =
     }
   ]
 
+const initialUsers = [
+  {
+    username: 'root',
+    name: 'Superuser',
+    password: 'sekret'
+  },
+  {
+    username: 'gatekeeper',
+    name: 'The Keeper',
+    password: 'salainen'
+  },
+  {
+    usename: 'guest',
+    name: 'Guest',
+    password: 'clandestine'
+  }
+]
+
 
 const blogInDb = async () => {
   const blogs = await Blog.find({})
@@ -54,5 +72,5 @@ const usersInDb = async () => {
 }
 
 module.exports = {
-  initialBlogs, blogInDb, usersInDb
+  initialBlogs, blogInDb, initialUsers, usersInDb
 }
