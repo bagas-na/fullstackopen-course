@@ -3,7 +3,7 @@ const User = require('../models/user')
 const argon2 = require('argon2')
 const logger = require('../utils/logger')
 
-usersRouter.post('/', async (request, response) => {
+usersRouter.post('/', async (request, response, next) => {
   const contentType = request.header('Content-Type')
 
   if (!contentType.includes('application/json')) {
@@ -15,7 +15,7 @@ usersRouter.post('/', async (request, response) => {
   }
 
   const { username, name, password } = request.body
-  if (request.body.username === undefined || request.body.password === undefined) {
+  if (username === undefined || password === undefined) {
     response.status(400).send({
       error: 'Unexpected json format',
       message: 'json must contain entries {username: ..., password: ...}'
@@ -23,21 +23,35 @@ usersRouter.post('/', async (request, response) => {
     return
   }
 
-  const passwordHash = await argon2.hash(password, {
-    memoryCost: 19456,
-    timeCost: 2,
-    parallelism: 1
-  })
+  if (username.length < 3 || password.length < 3) {
+    response.status(400).send({
+      error: 'Invalid username or password',
+      message: 'username and password must be at least 3 characters long'
+    })
+    return
+  }
 
-  const user = new User({
-    username,
-    name,
-    passwordHash,
-  })
+  try {
+    const passwordHash = await argon2.hash(password, {
+      memoryCost: 19456,
+      timeCost: 2,
+      parallelism: 1
+    })
 
-  const savedUser = await user.save()
+    const user = new User({
+      username,
+      name,
+      passwordHash,
+    })
 
-  response.status(201).json(savedUser)
+    const savedUser = await user.save()
+
+    response.status(201).json(savedUser)
+  } catch (error) {
+    logger.error('error creating user to database.')
+    next(error)
+  }
+
 })
 
 usersRouter.get('/', async (request, response, next) => {
