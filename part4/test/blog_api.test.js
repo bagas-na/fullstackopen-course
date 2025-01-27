@@ -27,6 +27,7 @@ const createUserPromise = async (username, name, password) => {
   return user.save()
 }
 
+// Populate user in database before tests, once only.
 before(async () => {
   try {
     await User.deleteMany({})
@@ -39,6 +40,7 @@ before(async () => {
   }
 })
 
+// Populate blog in database before each tests, with randomized user (owner) of posts
 beforeEach(async () => {
   try {
     await Blog.deleteMany({})
@@ -84,6 +86,17 @@ describe('GET blog endpoint', () => {
 })
 
 describe('POST blog endpoint', () => {
+  // Get bearer token before testing POST endpoints
+  let bearerToken = ''
+  before(async () => {
+    const response = await api.post('/api/login')
+      .send({ username: 'unclebob', password: 'agile' })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    bearerToken = response.body.token
+  })
+
   test('create new blog post', async () => {
     const newBlog = {
       title: 'The C Programming Language (Second Edition)',
@@ -91,7 +104,7 @@ describe('POST blog endpoint', () => {
       url: 'https://www.amazon.com/Programming-Language-2nd-Brian-Kernighan/dp/0131103628'
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(201)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlog).expect(201)
 
     const response = await api.get('/api/blogs')
     const length = response.body.length
@@ -111,7 +124,7 @@ describe('POST blog endpoint', () => {
       url: 'https://www.amazon.com/Programming-Language-2nd-Brian-Kernighan/dp/0131103628'
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(201)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlog).expect(201)
 
     const response = await api.get('/api/blogs')
     const length = response.body.length
@@ -139,33 +152,57 @@ describe('POST blog endpoint', () => {
       author: 'Brian Kernighan and Dennis Ritchie',
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(201)
-    await api.post('/api/blogs').send(newBlogNoTitle).expect(400)
-    await api.post('/api/blogs').send(newBlogNoAuthor).expect(201)
-    await api.post('/api/blogs').send(newBlogNoUrl).expect(400)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlog).expect(201)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlogNoTitle).expect(400)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlogNoAuthor).expect(201)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${bearerToken}`).send(newBlogNoUrl).expect(400)
   })
 })
 
 test('delete an existing blog', async () => {
+  // Choose arbitrary blog to delete (index 0)
   const currentBlogs = await helper.blogInDb()
   const deleteBlogId = currentBlogs[0].id
+
+  // Get user and password of the blog
+  const username = currentBlogs[0].user.username
+  const password = helper.initialUsers.find(user => user.username === username)?.password
+
+  // Login and get token
+  const responseLogin = await api.post('/api/login')
+    .send({ username, password })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  const bearerToken = responseLogin.body.token
 
   const responseBeforeDeletion = await api.get('/api/blogs')
   assert(responseBeforeDeletion.body.map(blog => blog.id).includes(deleteBlogId))
 
-  await api.delete(`/api/blogs/${deleteBlogId}`).expect(200)
+  await api.delete(`/api/blogs/${deleteBlogId}`).set('Authorization', `Bearer ${bearerToken}`).expect(200)
 
-  const response = await api.get('/api/blogs')
+  const responseAfterDeletion = await api.get('/api/blogs')
+  assert(!responseAfterDeletion.body.map(blog => blog.id).includes(deleteBlogId))
+  assert.strictEqual(responseAfterDeletion.body.length, helper.initialBlogs.length - 1)
 
-  assert.strictEqual(response.body.length, helper.initialBlogs.length - 1)
-  assert(!response.body.map(blog => blog.id).includes(deleteBlogId))
 
 })
 
 
 test('update an existing blog', async () => {
+  // Choose arbitrary blog to delete (index 0)
   const currentBlogs = await helper.blogInDb()
   const updateBlogId = currentBlogs[0].id
+
+  // Get user and password of the blog
+  const username = currentBlogs[0].user.username
+  const password = helper.initialUsers.find(user => user.username === username)?.password
+
+  // Login and get token
+  const responseLogin = await api.post('/api/login')
+    .send({ username, password })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  const bearerToken = responseLogin.body.token
 
   const blog = {
     title: currentBlogs[0].title,
@@ -186,7 +223,7 @@ test('update an existing blog', async () => {
   assert.notStrictEqual(blog.author, updateBlogContent.author)
   assert.notStrictEqual(blog.url, updateBlogContent.url)
 
-  await api.put(`/api/blogs/${updateBlogId}`).send(updateBlogContent).expect(200)
+  await api.put(`/api/blogs/${updateBlogId}`).set('Authorization', `Bearer ${bearerToken}`).send(updateBlogContent).expect(200)
 
   const response = await api.get('/api/blogs')
 
