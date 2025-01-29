@@ -1,17 +1,22 @@
 import { useState } from "react";
+import blogService from "../services/blogs";
 import loginService from "../services/login";
 
 const LoginForm = ({ setUser, setErrorMessage }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const loginUrl = "/api/login";
   const loginHandler = async (e) => {
     e.preventDefault();
-
     try {
-      user = await loginService.login({ username, password });
-      console.log(user)
+      const user = await loginService.login({ username, password });
+
+      blogService.setToken(user.token)
+
+      window.localStorage.setItem(
+        'loggedBlogAppUser', JSON.stringify(user)
+      )
+
       setUser(user);
       setUsername("");
       setPassword("");
@@ -40,7 +45,7 @@ const LoginForm = ({ setUser, setErrorMessage }) => {
         <div>
           <label htmlFor="">password</label>
           <input
-            type="text"
+            type="password"
             id="password"
             name="Password"
             value={password}

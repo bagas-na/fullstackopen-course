@@ -9,16 +9,24 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    if (loggedUserJSON) {
+      const loggedUser = JSON.parse(loggedUserJSON);
+      setUser(loggedUser);
+      blogService.setToken(loggedUser.token);
+    }
+  }, []);
+
+  useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
   return (
     <>
-      <p>User {JSON.stringify(user)}</p>
       {user === null ? (
         <LoginForm setUser={setUser} setErrorMessage={setErrorMessage} />
       ) : (
-        <BlogList blogs={blogs} />
+        <BlogList blogs={blogs} user={user} setUser={setUser} />
       )}
     </>
   );
