@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import blogService from "../services/blogs";
 import Notification from "./Notification";
 
@@ -8,8 +8,22 @@ const Blog = ({ blog }) => (
   </div>
 );
 
-const CreateBlogForm = ({ setNotification, setBlogs }) => {
+const CreateBlogForm = forwardRef(({ setNotification, setBlogs }, ref) => {
+  const [visible, setVisible] = useState(false);
   const formRef = useRef(null);
+
+  const hideWhenVisibleStyle = { display: visible ? "none" : "" };
+  const showWhenVisibleStyle = { display: visible ? "" : "none" };
+
+  const toggleVisibility = () => {
+    setVisible(!visible);
+  };
+
+  useImperativeHandle(ref, () => {
+    return {
+      toggleVisibility,
+    };
+  });
 
   const createBlogHandler = async (e) => {
     e.preventDefault();
@@ -20,14 +34,16 @@ const CreateBlogForm = ({ setNotification, setBlogs }) => {
       const url = formData.get("url");
 
       await blogService.create({ title, author, url });
-      const newBlogs = await blogService.getAll()
-      setBlogs(newBlogs)
-
-      setNotification({ isError: false, message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}`: ''}!` });
+      const newBlogs = await blogService.getAll();
+      setBlogs(newBlogs);
+      setVisible(false);
+      setNotification({
+        isError: false,
+        message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}` : ""}!`,
+      });
       setTimeout(() => {
         setNotification({ isError: false, message: null });
       }, 5000);
-
     } catch (error) {
       setNotification({ isError: true, message: "Failed adding a blog" });
       setTimeout(() => {
@@ -37,23 +53,33 @@ const CreateBlogForm = ({ setNotification, setBlogs }) => {
   };
 
   return (
-    <form ref={formRef} onSubmit={(e) => createBlogHandler(e)}>
-      <div>
-        <label htmlFor="title">title:</label>
-        <input type="text" name="title" id="title" />
-      </div>
-      <div>
-        <label htmlFor="author">author:</label>
-        <input type="text" name="author" id="author" />
-      </div>
-      <div>
-        <label htmlFor="url">url:</label>
-        <input type="text" name="url" id="url" />
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <div>
+      <form ref={formRef} onSubmit={(e) => createBlogHandler(e)} style={showWhenVisibleStyle}>
+        <div>
+          <label htmlFor="title">title:</label>
+          <input type="text" name="title" id="title" />
+        </div>
+        <div>
+          <label htmlFor="author">author:</label>
+          <input type="text" name="author" id="author" />
+        </div>
+        <div>
+          <label htmlFor="url">url:</label>
+          <input type="text" name="url" id="url" />
+        </div>
+        <button type="submit">create</button>
+        <button type="button" onClick={() => toggleVisibility()}>
+          cancel
+        </button>
+      </form>
+      <button type="button" onClick={() => toggleVisibility()} style={hideWhenVisibleStyle}>
+        new blog
+      </button>
+    </div>
   );
-};
+});
+
+CreateBlogForm.displayName = "CreateBlogForm";
 
 const BlogList = ({ blogs, setBlogs, user, setUser }) => {
   const [notification, setNotification] = useState({ isError: false, message: null });
