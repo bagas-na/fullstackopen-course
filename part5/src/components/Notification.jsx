@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-const Notification = ({ message }) => {
+const Notification = ({ isError, message }) => {
   if (message === null) {
     return null
   }

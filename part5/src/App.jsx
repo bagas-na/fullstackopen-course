@@ -25,7 +25,7 @@ const App = () => {
       {user === null ? (
         <LoginForm setUser={setUser}/>
       ) : (
-        <BlogList blogs={blogs} user={user} setUser={setUser} />
+        <BlogList blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
       )}
     </>
   );

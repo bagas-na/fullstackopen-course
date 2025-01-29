@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import blogService from "../services/blogs";
+import Notification from "./Notification";
 
 const Blog = ({ blog }) => (
   <div>
@@ -7,26 +8,30 @@ const Blog = ({ blog }) => (
   </div>
 );
 
-const CreateBlogForm = ({ setErrorMessage }) => {
+const CreateBlogForm = ({ setNotification, setBlogs }) => {
   const formRef = useRef(null);
 
   const createBlogHandler = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData(formRef.current)
-      const title = formData.get('title')
-      const author = formData.get('author')
-      const url = formData.get('url')
+      const formData = new FormData(formRef.current);
+      const title = formData.get("title");
+      const author = formData.get("author");
+      const url = formData.get("url");
 
-      console.log({title, author, url})
+      await blogService.create({ title, author, url });
+      const newBlogs = await blogService.getAll()
+      setBlogs(newBlogs)
 
-      const result = await blogService.create({title, author, url})
-      console.log(result)
+      setNotification({ isError: false, message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}`: ''}!` });
+      setTimeout(() => {
+        setNotification({ isError: false, message: null });
+      }, 5000);
 
     } catch (error) {
-      setErrorMessage("Error ");
+      setNotification({ isError: true, message: "Failed adding a blog" });
       setTimeout(() => {
-        setErrorMessage(null);
+        setNotification({ isError: false, message: null });
       }, 5000);
     }
   };
@@ -50,8 +55,8 @@ const CreateBlogForm = ({ setErrorMessage }) => {
   );
 };
 
-const BlogList = ({ blogs, user, setUser }) => {
-  const [errorMessage, setErrorMessage] = useState(null);
+const BlogList = ({ blogs, setBlogs, user, setUser }) => {
+  const [notification, setNotification] = useState({ isError: false, message: null });
 
   const logoutHandler = () => {
     setUser(null);
@@ -60,7 +65,8 @@ const BlogList = ({ blogs, user, setUser }) => {
   return (
     <div>
       <h2>Blogs</h2>
-      <CreateBlogForm user={user} setErrorMessage={setErrorMessage} />
+      <Notification isError={notification.isError} message={notification.message} />
+      <CreateBlogForm user={user} setBlogs={setBlogs} setNotification={setNotification} />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
       {blogs.map((blog) => (
