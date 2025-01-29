@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import BlogList from "./components/BlogList";
+import Blogs from "./components/Blogs";
 import LoginForm from "./components/LoginForm";
 import blogService from "./services/blogs";
 
@@ -25,7 +25,7 @@ const App = () => {
       {user === null ? (
         <LoginForm setUser={setUser}/>
       ) : (
-        <BlogList blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
+        <Blogs blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
       )}
     </>
   );

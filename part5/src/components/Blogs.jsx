@@ -8,7 +8,7 @@ const Blog = ({ blog }) => (
   </div>
 );
 
-const CreateBlogForm = forwardRef(({ setNotification, setBlogs }, ref) => {
+const BlogForm = forwardRef(({ createBlog }, ref) => {
   const [visible, setVisible] = useState(false);
   const formRef = useRef(null);
 
@@ -27,34 +27,20 @@ const CreateBlogForm = forwardRef(({ setNotification, setBlogs }, ref) => {
 
   const createBlogHandler = async (e) => {
     e.preventDefault();
-    try {
-      const formData = new FormData(formRef.current);
-      const title = formData.get("title");
-      const author = formData.get("author");
-      const url = formData.get("url");
 
-      await blogService.create({ title, author, url });
-      const newBlogs = await blogService.getAll();
-      setBlogs(newBlogs);
-      setVisible(false);
-      setNotification({
-        isError: false,
-        message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}` : ""}!`,
-      });
-      setTimeout(() => {
-        setNotification({ isError: false, message: null });
-      }, 5000);
-    } catch (error) {
-      setNotification({ isError: true, message: "Failed adding a blog" });
-      setTimeout(() => {
-        setNotification({ isError: false, message: null });
-      }, 5000);
-    }
+    console.log("submitting form", formRef.current);
+    const formData = new FormData(formRef.current);
+    console.log("formData", formData);
+    const title = formData.get("title");
+    const author = formData.get("author");
+    const url = formData.get("url");
+
+    await createBlog(title, author, url);
   };
 
   return (
     <div>
-      <form ref={formRef} onSubmit={(e) => createBlogHandler(e)} style={showWhenVisibleStyle}>
+      <form ref={formRef} onSubmit={createBlogHandler} style={showWhenVisibleStyle}>
         <div>
           <label htmlFor="title">title:</label>
           <input type="text" name="title" id="title" />
@@ -79,20 +65,45 @@ const CreateBlogForm = forwardRef(({ setNotification, setBlogs }, ref) => {
   );
 });
 
-CreateBlogForm.displayName = "CreateBlogForm";
+BlogForm.displayName = "BlogForm";
 
-const BlogList = ({ blogs, setBlogs, user, setUser }) => {
+const Blogs = ({ blogs, setBlogs, user, setUser }) => {
   const [notification, setNotification] = useState({ isError: false, message: null });
+  const blogFormRef = useRef(null);
+
+  const createBlog = async (title, author, url) => {
+    try {
+      await blogService.create({ title, author, url });
+      const newBlogs = await blogService.getAll();
+
+      setBlogs(newBlogs);
+      blogFormRef.current.toggleVisibility();
+
+      setNotification({
+        isError: false,
+        message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}` : ""}!`,
+      });
+      setTimeout(() => {
+        setNotification({ isError: false, message: null });
+      }, 5000);
+    } catch (error) {
+      setNotification({ isError: true, message: "Failed adding a blog" });
+      setTimeout(() => {
+        setNotification({ isError: false, message: null });
+      }, 5000);
+    }
+  };
 
   const logoutHandler = () => {
     setUser(null);
     window.localStorage.removeItem("loggedBlogAppUser");
   };
+
   return (
     <div>
       <h2>Blogs</h2>
       <Notification isError={notification.isError} message={notification.message} />
-      <CreateBlogForm user={user} setBlogs={setBlogs} setNotification={setNotification} />
+      <BlogForm createBlog={createBlog} ref={blogFormRef} />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
       {blogs.map((blog) => (
@@ -102,4 +113,4 @@ const BlogList = ({ blogs, setBlogs, user, setUser }) => {
   );
 };
 
-export default BlogList;
+export default Blogs;
