@@ -38,7 +38,7 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
 
   return (
     <div style={blogStyle}>
-      <p style={{ margin: 0, display: 'inline' }}>{blog.title} </p>
+      <p style={{ margin: 0, display: 'inline' }}>{blog.title} - {blog.author} </p>
       <button type="button" style={hideWhenDetailed} onClick={() => toggleDetail()}>
         view
       </button>
@@ -51,7 +51,7 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
         <button type="button" onClick={() => likeHandler()}>
           like
         </button>
-        <p style={{ margin: 0 }}>{blog.author}</p>
+        <p style={{ margin: 0 }}>{blog.user.name}</p>
         <button type="button" onClick={() => removeHandler()} disabled={!removable}>
           remove
         </button>
