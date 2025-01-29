@@ -6,7 +6,6 @@ import blogService from "./services/blogs";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -24,7 +23,7 @@ const App = () => {
   return (
     <>
       {user === null ? (
-        <LoginForm setUser={setUser} setErrorMessage={setErrorMessage} />
+        <LoginForm setUser={setUser}/>
       ) : (
         <BlogList blogs={blogs} user={user} setUser={setUser} />
       )}
