@@ -23,7 +23,7 @@ const App = () => {
   return (
     <>
       {user === null ? (
-        <LoginForm setUser={setUser}/>
+        <LoginForm setUser={setUser} />
       ) : (
         <Blogs blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
       )}

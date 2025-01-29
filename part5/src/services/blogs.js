@@ -26,8 +26,18 @@ const update = async (id, updatedBlog) => {
     headers: { Authorization: token },
   }
 
-  const response = await axios.put(`baseUrl/${id}`, updatedBlog, config)
+  const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, config)
   return response.data
 }
 
-export default { getAll, create, update, setToken }
+const incrementLike = async (id) => {
+  console.log(`Increment like for blog ${id}`)
+  const config = {
+    headers: { Authorization: token }
+  }
+  const response = await axios.put(`${baseUrl}/${id}/likes`, undefined, config )
+  console.log('response', response)
+  return response.data
+}
+
+export default { getAll, create, update, setToken, incrementLike }

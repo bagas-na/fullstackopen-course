@@ -81,6 +81,35 @@ blogsRouter.delete('/:id',
     }
   })
 
+blogsRouter.put('/:id/likes',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    if (request.token === null) {
+      response.status(401).json({ error: 'token required' })
+      return
+    }
+
+    const blogId = request.params.id
+
+    try {
+      const blog = await Blog.findById(blogId)
+      const updatedBlog = {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes + 1,
+        user: blog.user.toString()
+      }
+
+      const result = await Blog.findByIdAndUpdate(blogId, updatedBlog, { new: true })
+      response.status(200).json(result)
+
+    } catch (error) {
+      logger.error('error updating blog to database')
+      next(error)
+    }
+  })
+
 blogsRouter.put('/:id',
   middleware.userExtractor,
   async (request, response, next) => {
@@ -102,6 +131,11 @@ blogsRouter.put('/:id',
       return
     }
 
+    if (request.token === null) {
+      response.status(401).json({ error: 'token required' })
+      return
+    }
+
     const blogId = request.params.id
     const updatedBlog = {
       title: request.body.title,
@@ -111,13 +145,20 @@ blogsRouter.put('/:id',
     }
 
     try {
-      const result = await Blog.findByIdAndUpdate(blogId, updatedBlog, { new: true })
-      response.status(200).json(result)
+      const blog = await Blog.findById(blogId)
+      if (blog.user.toString() === request.user.id) {
+        const result = await Blog.findByIdAndUpdate(blogId, { ...updatedBlog, user: blog.user.toString() }, { new: true })
+        response.status(200).json(result)
+      } else {
+        response.status(401).json({ error: 'unauthorized' })
+      }
     } catch (error) {
       logger.error('error updating blog to database')
       next(error)
     }
   })
+
+
 
 
 module.exports = blogsRouter

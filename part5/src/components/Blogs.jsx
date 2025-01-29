@@ -2,11 +2,44 @@ import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import blogService from "../services/blogs";
 import Notification from "./Notification";
 
-const Blog = ({ blog }) => (
-  <div>
-    {blog.title} - {blog.author}
-  </div>
-);
+const Blog = ({ blog, likeHandler }) => {
+  const [showDetail, setShowDetail] = useState(false);
+
+  const toggleDetail = () => {
+    setShowDetail(!showDetail);
+  };
+
+  const hideWhenDetailed = { display: showDetail ? "none" : "" };
+  const showWhenDetailed = { display: showDetail ? "" : "none" };
+
+  const blogStyle = {
+    paddingTop: 5,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+  };
+
+  return (
+    <div style={blogStyle}>
+      <p style={{ margin: 0, display: "inline" }}>{blog.title} </p>
+      <button type="button" style={hideWhenDetailed} onClick={() => toggleDetail()}>
+        view
+      </button>
+      <button type="button" style={showWhenDetailed} onClick={() => toggleDetail()}>
+        hide
+      </button>
+      <div style={showWhenDetailed}>
+        <p style={{ margin: 0 }}>{blog.url}</p>
+        <p style={{ margin: 0, display: "inline" }}>likes: {blog.likes} </p>
+        <button type="button" onClick={() => likeHandler(blog.id)}>
+          like
+        </button>
+        <p style={{ margin: 0 }}>{blog.author}</p>
+      </div>
+    </div>
+  );
+};
 
 const BlogForm = forwardRef(({ createBlog }, ref) => {
   const [visible, setVisible] = useState(false);
@@ -94,6 +127,12 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
     }
   };
 
+  const incrementLike = async (blogId) => {
+    await blogService.incrementLike(blogId);
+    const newBlogs = await blogService.getAll();
+    setBlogs(newBlogs);
+  };
+
   const logoutHandler = () => {
     setUser(null);
     window.localStorage.removeItem("loggedBlogAppUser");
@@ -106,8 +145,8 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
       <BlogForm createBlog={createBlog} ref={blogFormRef} />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+      {blogs.sort((a, b) => b.likes - a.likes).map((blog) => (
+        <Blog key={blog.id} blog={blog} likeHandler={incrementLike} />
       ))}
     </div>
   );
