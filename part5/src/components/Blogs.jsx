@@ -2,15 +2,30 @@ import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import blogService from "../services/blogs";
 import Notification from "./Notification";
 
-const Blog = ({ blog, likeHandler }) => {
+const Blog = ({ user, blog, incrementLike, removeBlog }) => {
   const [showDetail, setShowDetail] = useState(false);
 
   const toggleDetail = () => {
     setShowDetail(!showDetail);
   };
 
+  const likeHandler = async () => {
+    await incrementLike(blog.id);
+  };
+
+  const removeHandler = async () => {
+    const confirmation = confirm(
+      `Remove blog ${blog.title}${blog.author.length > 0 ? ` by ${blog.author}` : ""}?`
+    );
+    if (confirmation) {
+      await removeBlog(blog.id);
+    }
+  };
+
   const hideWhenDetailed = { display: showDetail ? "none" : "" };
   const showWhenDetailed = { display: showDetail ? "" : "none" };
+
+  const removable = blog.user.username === user.username;
 
   const blogStyle = {
     paddingTop: 5,
@@ -32,10 +47,13 @@ const Blog = ({ blog, likeHandler }) => {
       <div style={showWhenDetailed}>
         <p style={{ margin: 0 }}>{blog.url}</p>
         <p style={{ margin: 0, display: "inline" }}>likes: {blog.likes} </p>
-        <button type="button" onClick={() => likeHandler(blog.id)}>
+        <button type="button" onClick={() => likeHandler()}>
           like
         </button>
         <p style={{ margin: 0 }}>{blog.author}</p>
+        <button type="button" onClick={() => removeHandler()} disabled={!removable}>
+          remove
+        </button>
       </div>
     </div>
   );
@@ -61,9 +79,7 @@ const BlogForm = forwardRef(({ createBlog }, ref) => {
   const createBlogHandler = async (e) => {
     e.preventDefault();
 
-    console.log("submitting form", formRef.current);
     const formData = new FormData(formRef.current);
-    console.log("formData", formData);
     const title = formData.get("title");
     const author = formData.get("author");
     const url = formData.get("url");
@@ -133,6 +149,12 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
     setBlogs(newBlogs);
   };
 
+  const removeBlog = async (blogId) => {
+    await blogService.remove(blogId);
+    const newBlogs = await blogService.getAll();
+    setBlogs(newBlogs);
+  };
+
   const logoutHandler = () => {
     setUser(null);
     window.localStorage.removeItem("loggedBlogAppUser");
@@ -145,9 +167,17 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
       <BlogForm createBlog={createBlog} ref={blogFormRef} />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
-      {blogs.sort((a, b) => b.likes - a.likes).map((blog) => (
-        <Blog key={blog.id} blog={blog} likeHandler={incrementLike} />
-      ))}
+      {blogs
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            incrementLike={incrementLike}
+            removeBlog={removeBlog}
+          />
+        ))}
     </div>
   );
 };

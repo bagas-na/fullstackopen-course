@@ -30,14 +30,21 @@ const update = async (id, updatedBlog) => {
   return response.data
 }
 
-const incrementLike = async (id) => {
-  console.log(`Increment like for blog ${id}`)
+const remove = async (id) => {
   const config = {
-    headers: { Authorization: token }
+    headers: { Authorization: token },
   }
-  const response = await axios.put(`${baseUrl}/${id}/likes`, undefined, config )
-  console.log('response', response)
+
+  const response = await axios.delete(`${baseUrl}/${id}`, config)
   return response.data
 }
 
-export default { getAll, create, update, setToken, incrementLike }
+const incrementLike = async (id) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  const response = await axios.put(`${baseUrl}/${id}/likes`, undefined, config)
+  return response.data
+}
+
+export default { getAll, create, update, remove, setToken, incrementLike }
