@@ -15,7 +15,7 @@ const Notification = ({ isError, message }) => {
 }
 Notification.propTypes = {
   isError: PropTypes.bool.isRequired,
-  message: PropTypes.string.isRequired,
+  message: PropTypes.string,
 }
 
 export default Notification

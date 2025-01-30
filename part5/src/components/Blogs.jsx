@@ -23,9 +23,6 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
     }
   }
 
-  const hideWhenDetailed = { display: showDetail ? 'none' : '' }
-  const showWhenDetailed = { display: showDetail ? '' : 'none' }
-
   const removable = blog.user.username === user.username
 
   const blogStyle = {
@@ -37,25 +34,33 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <p style={{ margin: 0, display: 'inline' }}>{blog.title} - {blog.author} </p>
-      <button type="button" style={hideWhenDetailed} onClick={() => toggleDetail()}>
-        view
-      </button>
-      <button type="button" style={showWhenDetailed} onClick={() => toggleDetail()}>
-        hide
-      </button>
-      <div style={showWhenDetailed}>
-        <p style={{ margin: 0 }}>{blog.url}</p>
-        <p style={{ margin: 0, display: 'inline' }}>likes: {blog.likes} </p>
-        <button type="button" onClick={() => likeHandler()}>
-          like
+    <div style={blogStyle} className="blog">
+      <p style={{ margin: 0, display: 'inline' }}>
+        {blog.title} - {blog.author}{' '}
+      </p>
+      {!showDetail && (
+        <button type="button" className="viewButton" onClick={() => toggleDetail()}>
+          view
         </button>
-        <p style={{ margin: 0 }}>{blog.user.name}</p>
-        <button type="button" onClick={() => removeHandler()} disabled={!removable}>
-          remove
+      )}
+      {showDetail && (
+        <button type="button" className="hideButton" onClick={() => toggleDetail()}>
+          hide
         </button>
-      </div>
+      )}
+      {showDetail && (
+        <div>
+          <p style={{ margin: 0 }} data-testid="blog-url">{blog.url}</p>
+          <p style={{ margin: 0, display: 'inline' }} data-testid="blog-likes">likes: {blog.likes} </p>
+          <button type="button" className="likeButton" onClick={likeHandler}>
+            like
+          </button>
+          <p style={{ margin: 0 }} data-testid="blog-user">{blog.user.name}</p>
+          <button type="button" className="removeButton" onClick={removeHandler} disabled={!removable}>
+            remove
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -220,4 +225,4 @@ Blogs.propTypes = {
   setUser: PropTypes.func.isRequired,
 }
 
-export default Blogs
+export { Blog, BlogForm, Blogs }
