@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
-import { Blog } from './Blogs'
+import { Blog, BlogForm } from './Blogs'
 
 test('renders blog title and author but no url or likes by default', () => {
   const user = {
@@ -113,4 +113,32 @@ test('if the like button is clicked twice, the event handler is called twice', a
   await eventTester.click(likeButton)
 
   expect(incrementLike.mock.calls).toHaveLength(2)
+})
+
+test('create blog form submission', async () => {
+  const newBlog = {
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https: //reactpatterns.com/',
+  }
+  const createBlog = vi.fn()
+
+  const { container } = render(<BlogForm createBlog={createBlog} />)
+
+  const eventTester = userEvent.setup()
+  const newBlogButton = screen.getByRole('button', { name: /new blog/i })
+  await eventTester.click(newBlogButton)
+
+  const titleInput = screen.getByRole('textbox', { name: /title/i })
+  const authorInput = screen.getByRole('textbox', { name: /author/i })
+  const urlInput = screen.getByRole('textbox', { name: /url/i })
+  const submitButton = screen.getByRole('button', { name: 'create' })
+
+  await eventTester.type(titleInput, newBlog.title),
+  await eventTester.type(authorInput, newBlog.author),
+  await eventTester.type(urlInput, newBlog.url),
+  await eventTester.click(submitButton)
+
+  expect(createBlog).toHaveBeenCalledTimes(1)
+  expect(createBlog).toHaveBeenCalledWith(newBlog.title, newBlog.author, newBlog.url)
 })
