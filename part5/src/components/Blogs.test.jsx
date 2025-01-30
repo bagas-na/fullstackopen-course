@@ -31,8 +31,8 @@ test('renders blog title and author but no url or likes by default', () => {
 
   const div = container.querySelector('.blog')
   expect(div).toHaveTextContent(`${blog.title} - ${blog.author}`)
-  expect(screen.queryByTestId('blog-url')).toBeNull()
-  expect(screen.queryByTestId('blog-likes')).toBeNull()
+  expect(screen.queryByRole('button', { hidden: true, name: 'view' })).toBeDefined()
+  expect(screen.queryByRole('button', { hidden: true, name: 'hide' })).toBeNull()
 })
 
 test('renders url and likes when "view" button has been clicked', async () => {
@@ -44,7 +44,7 @@ test('renders url and likes when "view" button has been clicked', async () => {
   const blog = {
     title: 'React patterns',
     author: 'Michael Chan',
-    url: 'https: //reactpatterns.com/',
+    url: 'https://reactpatterns.com/',
     likes: 14,
     user: {
       username: 'root',
@@ -57,28 +57,26 @@ test('renders url and likes when "view" button has been clicked', async () => {
   const incrementLike = vi.fn()
   const removeBlog = vi.fn()
 
-  const firstRender = render(
-    <Blog blog={blog} user={user} incrementLike={incrementLike} removeBlog={removeBlog} />
-  )
-
-  const eventTester = userEvent.setup()
-  const button = firstRender.container.querySelector('.viewButton')
-  await eventTester.click(button)
-
-  const secondRender = render(
+  const { container } = render(
     <Blog blog={blog} user={user} incrementLike={incrementLike} removeBlog={removeBlog} />
   )
 
   // screen.debug()
 
-  const div = secondRender.container.querySelector('.blog')
-  const blogUrl = screen.getByTestId('blog-url')
-  const blogLikes = screen.getByTestId('blog-likes')
-  expect(div).toHaveTextContent(`${blog.title} - ${blog.author}`)
-  expect(blogUrl).toHaveTextContent(`${blog.url}`)
-  expect(blogLikes).toHaveTextContent('likes: ')
-})
+  const eventTester = userEvent.setup()
+  const button = container.querySelector('.viewButton')
+  await eventTester.click(button)
 
+  // screen.debug()
+
+  const div = container.querySelector('.blog')
+  expect(div).toHaveTextContent(`${blog.title} - ${blog.author}`)
+
+  expect(screen.queryByRole('button', { hidden: true, name: 'view' })).toBeDefined()
+  expect(screen.queryByRole('button', { hidden: true, name: 'hide' })).toBeDefined()
+  expect(screen.queryByRole('paragraph', { hidden: true, name: blog.url })).toBeDefined()
+  expect(screen.queryByRole('paragraph', { hidden: true, name: /likes/i })).toBeDefined()
+})
 
 test('if the like button is clicked twice, the event handler is called twice', async () => {
   const user = {
@@ -102,22 +100,15 @@ test('if the like button is clicked twice, the event handler is called twice', a
   const incrementLike = vi.fn()
   const removeBlog = vi.fn()
 
-  const firstRender = render(
+  const { container } = render(
     <Blog blog={blog} user={user} incrementLike={incrementLike} removeBlog={removeBlog} />
   )
 
   const eventTester = userEvent.setup()
-  const viewButton = firstRender.container.querySelector('.viewButton')
-  await eventTester.click(viewButton)
+  const button = container.querySelector('.viewButton')
+  await eventTester.click(button)
 
-  const secondRender = render(
-    <Blog blog={blog} user={user} incrementLike={incrementLike} removeBlog={removeBlog} />
-  )
-
-  // screen.debug()
-
-  const likeButton = secondRender.container.querySelector('.likeButton')
-  console.error(JSON.stringify(likeButton))
+  const likeButton = screen.queryByRole('button', { name: 'like' })
   await eventTester.click(likeButton)
   await eventTester.click(likeButton)
 

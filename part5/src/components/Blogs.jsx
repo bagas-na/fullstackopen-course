@@ -49,14 +49,18 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
         </button>
       )}
       {showDetail && (
-        <div>
-          <p style={{ margin: 0 }} data-testid="blog-url">{blog.url}</p>
-          <p style={{ margin: 0, display: 'inline' }} data-testid="blog-likes">likes: {blog.likes} </p>
+        <div className="blogDetail">
+          <p style={{ margin: 0 }}>{blog.url}</p>
+          <p style={{ margin: 0, display: 'inline' }}>likes: {blog.likes} </p>
           <button type="button" className="likeButton" onClick={likeHandler}>
             like
           </button>
-          <p style={{ margin: 0 }} data-testid="blog-user">{blog.user.name}</p>
-          <button type="button" className="removeButton" onClick={removeHandler} disabled={!removable}>
+          <p style={{ margin: 0 }}>{blog.user.name}</p>
+          <button
+            type="button"
+            className="removeButton"
+            onClick={removeHandler}
+            disabled={!removable}>
             remove
           </button>
         </div>
