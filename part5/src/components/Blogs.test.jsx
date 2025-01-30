@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
 import { Blog, BlogForm } from './Blogs'
@@ -125,20 +125,23 @@ test('create blog form submission', async () => {
 
   const { container } = render(<BlogForm createBlog={createBlog} />)
 
-  const eventTester = userEvent.setup()
+  const eventTester = userEvent.setup({ delay: null }) // set delay to null to speed up typing
   const newBlogButton = screen.getByRole('button', { name: /new blog/i })
   await eventTester.click(newBlogButton)
 
-  const titleInput = screen.getByRole('textbox', { name: /title/i })
-  const authorInput = screen.getByRole('textbox', { name: /author/i })
-  const urlInput = screen.getByRole('textbox', { name: /url/i })
-  const submitButton = screen.getByRole('button', { name: 'create' })
+  const [titleInput, authorInput, urlInput, submitButton] = await Promise.all([
+    screen.findByRole('textbox', { name: /title/i }),
+    screen.findByRole('textbox', { name: /author/i }),
+    screen.findByRole('textbox', { name: /url/i }),
+    screen.findByRole('button', { name: /create/i }),
+  ])
 
-  await eventTester.type(titleInput, newBlog.title),
+  await eventTester.type(titleInput, newBlog.title)
   await eventTester.type(authorInput, newBlog.author),
   await eventTester.type(urlInput, newBlog.url),
   await eventTester.click(submitButton)
 
   expect(createBlog).toHaveBeenCalledTimes(1)
   expect(createBlog).toHaveBeenCalledWith(newBlog.title, newBlog.author, newBlog.url)
+
 })

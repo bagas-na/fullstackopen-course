@@ -38,7 +38,7 @@ const LoginForm = ({ setUser }) => {
       <Notification isError={notification.isError} message={notification.message} />
       <form onSubmit={loginHandler}>
         <div>
-          <label htmlFor="">username</label>
+          <label htmlFor="username">username</label>
           <input
             type="text"
             id="username"
@@ -48,7 +48,7 @@ const LoginForm = ({ setUser }) => {
           />
         </div>
         <div>
-          <label htmlFor="">password</label>
+          <label htmlFor="password">password</label>
           <input
             type="password"
             id="password"
