@@ -17,7 +17,7 @@ const LoginForm = ({ setUser }) => {
       blogService.setToken(user.token)
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
 
-      setNotification({ isError: false, message: `Sucessfully logged in as ${username}!` })
+      setNotification({ isError: false, message: `Successfully logged in as ${username}!` })
       setTimeout(() => {
         setUser(user)
         setUsername('')

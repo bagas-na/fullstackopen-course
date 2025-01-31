@@ -34,7 +34,7 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle} className="blog">
+    <article style={blogStyle} className="blog">
       <p style={{ margin: 0, display: 'inline' }}>
         {blog.title} - {blog.author}{' '}
       </p>
@@ -65,7 +65,7 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
           </button>
         </div>
       )}
-    </div>
+    </article>
   )
 }
 Blog.propTypes = {
@@ -158,7 +158,7 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
 
       setNotification({
         isError: false,
-        message: `Sucessfully added blog ${title}${author.length > 0 ? ` by ${author}` : ''}!`,
+        message: `Successfully added blog ${title}${author.length > 0 ? ` by ${author}` : ''}!`,
       })
       setTimeout(() => {
         setNotification({ isError: false, message: null })

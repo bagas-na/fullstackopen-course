@@ -8,7 +8,7 @@ const Notification = ({ isError, message }) => {
   const className = isError ? 'error notification' : 'notification'
 
   return (
-    <div className={className}>
+    <div className={className} role='notification'>
       {message}
     </div>
   )
