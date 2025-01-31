@@ -49,7 +49,8 @@ router.post('/populate', async (request, response) => {
     // Use for loop to avoid racing condition in concatenating blogs of the same user
     for (let blog of helper.initialBlogs) {
       const randIndex = Math.floor(Math.random() * users.length) % users.length
-      const blogObject = new Blog({ ...blog, user: users[randIndex].id })
+      const randLikes = Math.floor(Math.random()*Math.random()*100)
+      const blogObject = new Blog({ ...blog, likes:randLikes, user: users[randIndex].id })
       const savedBlog = await blogObject.save()
 
       const blogUser = await User.findById(users[randIndex].id)
