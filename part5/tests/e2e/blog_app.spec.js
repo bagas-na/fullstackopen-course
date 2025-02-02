@@ -118,13 +118,18 @@ test.describe('Blog app with already filled database', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(frontEndUrl)
     await loginWith(page, 'torvalds', 'justforfun')
+    await page.waitForSelector('div[role="notification"]')
 
+    await page.screenshot({ path: './after-initialization.png' })
     // Open details for each blog
   })
 
   test('all blogs have disabled delete button', async ({ page }) => {
     const viewButtons = page.getByRole('button', { name: 'view' })
-    expect(true).toBeTruthy()
+    const viewButtonCount = await viewButtons.count()
+
+    expect(viewButtonCount).toStrictEqual(6)
+
   })
 
   test('disabled delete button does not work',async ({ page }) => {
