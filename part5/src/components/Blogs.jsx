@@ -162,7 +162,7 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
       })
       setTimeout(() => {
         setNotification({ isError: false, message: null })
-      }, 5000)
+      }, 1500)
     } catch (error) {
       setNotification({ isError: true, message: 'Failed adding a blog' })
       setTimeout(() => {

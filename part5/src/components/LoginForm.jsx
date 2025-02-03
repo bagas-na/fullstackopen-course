@@ -23,7 +23,7 @@ const LoginForm = ({ setUser }) => {
         setUsername('')
         setPassword('')
         setNotification({ isError: false, message: null })
-      }, 2000)
+      }, 500)
     } catch (error) {
       setNotification({ isError: true, message: 'Wrong credentials!' })
       setTimeout(() => {

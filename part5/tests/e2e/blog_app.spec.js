@@ -115,23 +115,17 @@ test.describe('Blog app with already filled database', () => {
     })
   })
 
-  test.describe('only the user who added the blog sees the blog\'s delete button as enabled', () => {
+  test.describe('When logged in as a new user', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(frontEndUrl)
       await loginWith(page, 'torvalds', 'justforfun')
 
       const notification = page.getByTestId('notification')
       await notification.waitFor({ state: 'attached' })
-
-      // await page.screenshot({ path: './success-login.png' })
-      // screenshot should show a success login banner
-
       await notification.waitFor({ state: 'detached' })
     })
 
     test('all blogs have disabled delete button', async ({ page }) => {
-      // await page.screenshot({ path: './blog-list-1.png' })
-
       // Open details for each blog
       const viewButtons = page.getByRole('button', { name: 'view', })
       const viewButtonCount = await viewButtons.count()
@@ -143,8 +137,6 @@ test.describe('Blog app with already filled database', () => {
         // changes at each iteration
       }
 
-      // await page.screenshot({ path: './blog-list-expanded-1.png' })
-
       // Check for remove button counts
       const enabledRemoveButtonCount = await page.getByRole('button', { name: 'remove', disabled: false }).count()
       const disabledRemoveButtonCount = await page.getByRole('button', { name: 'remove', disabled: true }).count()
@@ -155,7 +147,6 @@ test.describe('Blog app with already filled database', () => {
     })
 
     test('added blog can be deleted', async ({ page }) => {
-      // await page.screenshot({ path: './blog-list-2.png' })
       let blogCount = await page.getByRole('article').count()
       expect(blogCount).toStrictEqual(6)
 
@@ -167,7 +158,6 @@ test.describe('Blog app with already filled database', () => {
       )
 
       blogCount = await page.getByRole('article').count()
-      // await page.screenshot({ path: './blog-list-2-1.png' })
       expect(blogCount).toStrictEqual(7)
 
       // Open details for each blog
@@ -177,14 +167,14 @@ test.describe('Blog app with already filled database', () => {
       for (let i = viewButtonCount - 1; i >= 0; i--) {
         await viewButtons.nth(i).click()
       }
-      // await page.screenshot({ path: './blog-list-expanded-2.png' })
 
+      // Check for remove button counts
       const enabledRemoveButtonCount = await page.getByRole('button', { name: 'remove', disabled: false }).count()
       const disabledRemoveButtonCount = await page.getByRole('button', { name: 'remove', disabled: true }).count()
-
       expect(enabledRemoveButtonCount).toStrictEqual(1)
       expect(disabledRemoveButtonCount).toStrictEqual(6)
 
+      // New post can be deleted
       page.on('dialog', dialog => dialog.accept())
       const removeButton = page.getByRole('button', { name: 'remove', disabled: false }).first()
       await removeButton.click()
@@ -195,5 +185,84 @@ test.describe('Blog app with already filled database', () => {
     })
   })
 
-  // test('blogs are sorted according to the number of likes in descending order')
+  test.describe('When logged in', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto(frontEndUrl)
+      await loginWith(page, 'torvalds', 'justforfun')
+
+      const notification = page.getByTestId('notification')
+      await notification.waitFor({ state: 'attached' })
+      await notification.waitFor({ state: 'detached' })
+    })
+
+    test('there are 6 blogs at the start', async ({ page }) => {
+      const blogCount = await page.getByRole('article').count()
+      expect(blogCount).toStrictEqual(6)
+
+      // Open details for each blog
+      const viewButtons = page.getByRole('button', { name: 'view' })
+      const viewButtonCount = await viewButtons.count()
+      for (let i = viewButtonCount - 1; i >= 0; i--) {
+        await viewButtons.nth(i).click()
+      }
+
+      const likeButtons = page.getByText(/likes/i)
+      const likeButtonCount = await likeButtons.count()
+      expect(likeButtonCount).toStrictEqual(6)
+    })
+
+    test('blogs are sorted by number of likes in descending order', async ({ page }) => {
+      // Open details for each blog
+      const viewButtons = page.getByRole('button', { name: 'view' })
+      const viewButtonCount = await viewButtons.count()
+      for (let i = viewButtonCount - 1; i >= 0; i--) {
+        await viewButtons.nth(i).click()
+      }
+
+      const likeTexts = page.getByText(/likes/i)
+      const likeTextCount = await likeTexts.count()
+      expect(likeTextCount).toStrictEqual(6)
+
+      for (let i = likeTextCount - 1; i > 0; i--) {
+        const string_b = await likeTexts.nth(i).innerText()
+        const string_a = await likeTexts.nth(i-1).innerText()
+
+        const num_b = Number(string_b.split(' ')[1])
+        const num_a = Number(string_a.split(' ')[1])
+        expect(num_b).toBeLessThanOrEqual(num_a)
+      }
+    })
+
+    test('after 30 likes (on the last blog) blogs are still sorted', async ({ page }) => {
+      // Open details for each blog
+      const viewButtons = page.getByRole('button', { name: 'view' })
+      const viewButtonCount = await viewButtons.count()
+      for (let i = viewButtonCount - 1; i >= 0; i--) {
+        await viewButtons.nth(i).click()
+      }
+
+      const likeTexts = page.getByText(/likes/i)
+      const likeTextCount = await likeTexts.count()
+      expect(likeTextCount).toStrictEqual(6)
+
+      const likeButtons = page.getByRole('button', { name: /like/i })
+      const likeButtonCount = await likeButtons.count()
+      expect(likeButtonCount).toStrictEqual(6)
+
+      for (let i = 0; i < 30; i++) {
+        await likeButtons.nth(5).click()
+        await page.waitForResponse(/api\/blogs/i)
+      }
+
+      for (let i = likeTextCount - 1; i > 0; i--) {
+        const string_b = await likeTexts.nth(i).innerText()
+        const string_a = await likeTexts.nth(i-1).innerText()
+
+        const num_b = Number(string_b.split(' ')[1])
+        const num_a = Number(string_a.split(' ')[1])
+        expect(num_b).toBeLessThanOrEqual(num_a)
+      }
+    })
+
+  })
 })
