@@ -1,4 +1,4 @@
-const loginWith = async (page, username, password)  => {
+const loginWith = async (page, username, password) => {
   const usernameField = page.getByLabel(/username/i)
   await usernameField.fill(username)
   const passwordField = page.getByLabel(/password/i)
@@ -15,7 +15,10 @@ const createBlog = async (page, title, author, url) => {
   await page.getByLabel(/author/i).fill(author)
   await page.getByLabel(/url/i).fill(url)
 
-  await page.getByText('create').click()
+  await page.getByRole('button', { name: 'create' }).click()
+
+  const notification = page.getByTestId('notification')
+  await notification.waitFor({ state: 'attached' })
 }
 
 export { createBlog, loginWith }
