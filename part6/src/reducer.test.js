@@ -31,7 +31,7 @@ describe('unicafe reducer', () => {
     deepFreeze(state)
     const newState = counterReducer(state, action)
     expect(newState).toEqual({
-      ...state, good: state.good
+      ...state, good: state.good + 1
     })
   })
 
@@ -48,7 +48,7 @@ describe('unicafe reducer', () => {
     deepFreeze(state)
     const newState = counterReducer(state, action)
     expect(newState).toEqual({
-      ...state, ok: state.ok
+      ...state, ok: state.ok + 1
     })
   })
 
@@ -65,7 +65,7 @@ describe('unicafe reducer', () => {
     deepFreeze(state)
     const newState = counterReducer(state, action)
     expect(newState).toEqual({
-      ...state, bad: state.bad
+      ...state, bad: state.bad + 1
     })
   })
 
@@ -82,7 +82,7 @@ describe('unicafe reducer', () => {
     deepFreeze(state)
     const newState = counterReducer(state, action)
     expect(newState).toEqual({
-      ...state
+      ...initialState
     })
   })
 })
