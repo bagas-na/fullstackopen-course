@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addVoteOfId } from '../reducers/anecdoteReducer';
+import anecdoteService from '../../services/anecdoteService';
+import { addVoteOfId, setAnecdotes } from '../reducers/anecdoteReducer';
 import { setNotification } from '../reducers/notificationReducer';
 
 const AnecdoteList = () => {
@@ -14,13 +16,19 @@ const AnecdoteList = () => {
   });
   const dispatch = useDispatch();
 
-  const vote = (id, content) => {
-    dispatch(addVoteOfId(id));
+  useEffect(() => {
+    anecdoteService.getAll().then((anecdote) => dispatch(setAnecdotes(anecdote)));
+  }, []);
 
-    dispatch(setNotification(`You voted for "${content}"`))
+  const vote = async (id) => {
+    const { content, votes } = anecdotesArray.find(anecdote => anecdote.id === id)
+    const updatedAnecdote = await anecdoteService.update(id, { id, content, votes: votes + 1 })
+    dispatch(addVoteOfId(updatedAnecdote.id));
+
+    dispatch(setNotification(`You voted for "${content}"`));
     setTimeout(() => {
-      dispatch(setNotification(''))
-    }, 5000)
+      dispatch(setNotification(''));
+    }, 5000);
   };
 
   const style = {
@@ -31,7 +39,8 @@ const AnecdoteList = () => {
     <div style={style} key={anecdote.id}>
       <div>{anecdote.content}</div>
       <div>
-        has {anecdote.votes} <button onClick={() => vote(anecdote.id, anecdote.content)}>vote</button>
+        has {anecdote.votes}{' '}
+        <button onClick={() => vote(anecdote.id)}>vote</button>
       </div>
     </div>
   ));

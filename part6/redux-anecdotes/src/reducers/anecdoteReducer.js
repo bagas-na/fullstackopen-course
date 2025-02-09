@@ -19,11 +19,12 @@ const asObject = (anecdote) => {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 const initialState = anecdotesAtStart.map(asObject)
 
 const anecdoteSlice = createSlice({
   name: 'anecdote',
-  initialState,
+  initialState: [],
   reducers: {
     addVoteOfId(state, action) {
       const id = action.payload
@@ -33,11 +34,15 @@ const anecdoteSlice = createSlice({
       )
     },
     createAnecdote(state, action) {
-      const newAnecdote = action.payload
-      state.push(asObject(newAnecdote))
+      state.push(
+        action.payload
+      )
+    },
+    setAnecdotes(state, action) {
+      return action.payload
     }
   }
 })
 
-export const { addVoteOfId, createAnecdote } = anecdoteSlice.actions
+export const { addVoteOfId, createAnecdote, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
