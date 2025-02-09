@@ -19,18 +19,14 @@ let notificationTimeOutId = null;
 export const setNotification = (message, duration = 5) => {
   return async (dispatch) => {
     dispatch(updateNotification(message))
-    console.log(`Dispatched notification: ${message.slice(0, 20)}... timeOutId = ${notificationTimeOutId}`)
 
     if (notificationTimeOutId) {
       clearTimeout(notificationTimeOutId)
-      console.log(`clear timeOutId: ${notificationTimeOutId}`)
     }
 
     notificationTimeOutId = setTimeout(() => {
-      console.log('clear notification')
       dispatch(updateNotification(''))
     }, duration * 1000)
-    console.log(`added new timeOutId: ${notificationTimeOutId}, duration: ${duration} seconds`)
   }
 }
 
