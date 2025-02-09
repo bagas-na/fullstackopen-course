@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import anecdoteService from '../../services/anecdoteService';
-import { addVoteOfId, setAnecdotes } from '../reducers/anecdoteReducer';
-import { setNotification } from '../reducers/notificationReducer';
+import { initializeAnecdotes, voteAnecdote } from '../reducers/anecdoteReducer';
 
 const AnecdoteList = () => {
   const anecdotesArray = useSelector(({ anecdotes, filter }) => {
@@ -17,18 +15,11 @@ const AnecdoteList = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    anecdoteService.getAll().then((anecdote) => dispatch(setAnecdotes(anecdote)));
+    dispatch(initializeAnecdotes())
   }, []);
 
   const vote = async (id) => {
-    const { content, votes } = anecdotesArray.find(anecdote => anecdote.id === id)
-    const updatedAnecdote = await anecdoteService.update(id, { id, content, votes: votes + 1 })
-    dispatch(addVoteOfId(updatedAnecdote.id));
-
-    dispatch(setNotification(`You voted for "${content}"`));
-    setTimeout(() => {
-      dispatch(setNotification(''));
-    }, 5000);
+    dispatch(voteAnecdote(id))
   };
 
   const style = {
