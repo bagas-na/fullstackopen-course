@@ -1,5 +1,5 @@
-import { useDispatch } from "react-redux"
-import { updateFilter } from "../reducers/filterReducer"
+import { useDispatch } from 'react-redux'
+import { updateFilter } from '../reducers/filterReducer'
 
 const Filter = () => {
   const dispatch = useDispatch()
