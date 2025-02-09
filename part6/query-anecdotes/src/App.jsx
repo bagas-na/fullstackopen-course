@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useNotificationDispatch } from "../context/NotificationContext";
 import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
 import anecdoteService from "./services/anecdotes";
 
 const App = () => {
+  const notificationDispatch = useNotificationDispatch();
   const queryClient = useQueryClient();
   const updateAnecdoteMutation = useMutation({
     mutationFn: anecdoteService.update,
@@ -16,6 +18,16 @@ const App = () => {
           anecdote.id === updatedAnecdote.id ? updatedAnecdote : anecdote
         )
       );
+      notificationDispatch({
+        type: "VOTE",
+        payload: updatedAnecdote,
+      });
+
+      setTimeout(() => {
+        notificationDispatch({
+          type: "RESET",
+        });
+      }, 5000);
     },
   });
 
@@ -33,7 +45,7 @@ const App = () => {
     retry: false,
     refetchOnWindowFocus: false,
   });
-  const anecdotes = result.data?.sort((a,b) => b.votes - a.votes);
+  const anecdotes = result.data?.sort((a, b) => b.votes - a.votes);
 
   if (result.isLoading) {
     return <div>loading data...</div>;
