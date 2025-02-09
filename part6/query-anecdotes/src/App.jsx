@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query"
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
+import anecdoteService from './services/anecdotes'
 
 const App = () => {
 
@@ -7,13 +9,20 @@ const App = () => {
     console.log('vote')
   }
 
-  const anecdotes = [
-    {
-      "content": "If it hurts, do it more often",
-      "id": "47145",
-      "votes": 0
-    },
-  ]
+  const result = useQuery({
+    queryKey: ['anecdotes'],
+    queryFn: anecdoteService.getAll,
+    retry: 1
+  })
+  const anecdotes = result.data
+
+  if(result.isLoading) {
+    return <div>loading data...</div>
+  }
+
+  if(result.isError) {
+    return <div>anecdote service not available due to problems in server</div>
+  }
 
   return (
     <div>
@@ -21,14 +30,13 @@ const App = () => {
     
       <Notification />
       <AnecdoteForm />
-    
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
+      {result.isSuccess && anecdotes.map(anecdote =>
+        <div style={{marginTop: 6}} key={anecdote.id}>
           <div>
             {anecdote.content}
           </div>
           <div>
-            has {anecdote.votes}
+            has {anecdote.votes}{" "}
             <button onClick={() => handleVote(anecdote)}>vote</button>
           </div>
         </div>
