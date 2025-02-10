@@ -187,10 +187,10 @@ const App = () => {
       <Menu />
       <Notification notification={notification} />
       <Routes>
-        <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
+        <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} vote={vote} />} />
         <Route path="/about" element={<About />} />
         <Route path="/create/" element={<CreateNew addNew={addNew} />} />
-        <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route path="/" element={<AnecdoteList anecdotes={anecdotes} vote={vote} />} />
       </Routes>
       <Footer />
     </div>
