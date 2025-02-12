@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { pushNotification } from '../reducers/notificationReducer'
 import blogService from '../services/blogs'
 import loginService from '../services/login'
 import Notification from './Notification'
@@ -7,7 +9,7 @@ import Notification from './Notification'
 const LoginForm = ({ setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [notification, setNotification] = useState({ isError: false, message: null })
+  const dispatch = useDispatch()
 
   const loginHandler = async (e) => {
     e.preventDefault()
@@ -16,54 +18,59 @@ const LoginForm = ({ setUser }) => {
 
       blogService.setToken(user.token)
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-
-      setNotification({ isError: false, message: `Successfully logged in as ${username}!` })
+      dispatch(
+        pushNotification({
+          isError: false,
+          message: `Successfully logged in as ${username}!`,
+        })
+      )
       setTimeout(() => {
-        setUser(user)
         setUsername('')
         setPassword('')
-        setNotification({ isError: false, message: null })
-      }, 500)
-    } catch (error) {
-      setNotification({ isError: true, message: 'Wrong credentials!' })
-      setTimeout(() => {
-        setNotification({ isError: false, message: null })
+        setUser(user)
       }, 5000)
+    } catch (error) {
+      dispatch(
+        pushNotification({
+          isError: true,
+          message: 'Wrong credentials!',
+        })
+      )
     }
   }
 
   return (
     <div>
       <h2>Log in to Application</h2>
-      <Notification isError={notification.isError} message={notification.message} />
+      <Notification />
       <form onSubmit={loginHandler}>
         <div>
-          <label htmlFor="username">username</label>
+          <label htmlFor='username'>username</label>
           <input
-            type="text"
-            id="username"
-            name="Username"
+            type='text'
+            id='username'
+            name='Username'
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="password">password</label>
+          <label htmlFor='password'>password</label>
           <input
-            type="password"
-            id="password"
-            name="Password"
+            type='password'
+            id='password'
+            name='Password'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button type='submit'>login</button>
       </form>
     </div>
   )
 }
 LoginForm.propTypes = {
-  setUser: PropTypes.func.isRequired
+  setUser: PropTypes.func.isRequired,
 }
 
 export default LoginForm
