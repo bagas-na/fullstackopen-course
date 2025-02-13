@@ -5,7 +5,6 @@ const notificationSlice = createSlice({
   initialState: { message: '', isError: false },
   reducers: {
     updateNotification(state, action) {
-      console.log(action.payload)
       const { message, isError } = action.payload
       return { message, isError }
     },
@@ -16,7 +15,7 @@ const { updateNotification } = notificationSlice.actions
 
 let timeoutID = null
 
-export const pushNotification = (notification) => {
+export const pushNotification = (notification, duration = 5) => {
   return async (dispatch) => {
     dispatch(updateNotification(notification))
 
@@ -26,7 +25,7 @@ export const pushNotification = (notification) => {
 
     timeoutID = setTimeout(() => {
       dispatch(updateNotification({ message: '', isError: false }))
-    }, 5 * 1000)
+    }, duration * 1000)
 
   }
 }

@@ -1,25 +1,31 @@
 import PropTypes from 'prop-types'
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { createBlog, incrementLike, removeBlogOfId } from '../reducers/blogReducer'
+import { pushNotification } from '../reducers/notificationReducer'
 import blogService from '../services/blogs'
 import Notification from './Notification'
 
-const Blog = ({ user, blog, incrementLike, removeBlog }) => {
+const Blog = ({ user, blog }) => {
   const [showDetail, setShowDetail] = useState(false)
+  const dispatch = useDispatch()
 
   const toggleDetail = () => {
     setShowDetail(!showDetail)
   }
 
   const likeHandler = async () => {
-    await incrementLike(blog.id)
+    dispatch(incrementLike(blog))
   }
 
   const removeHandler = async () => {
     const confirmation = window.confirm(
-      `Remove blog ${blog.title}${blog.author.length > 0 ? ` by ${blog.author}` : ''}?`
+      `Remove blog ${blog.title}${
+        blog.author.length > 0 ? ` by ${blog.author}` : ''
+      }?`
     )
     if (confirmation) {
-      await removeBlog(blog.id)
+      dispatch(removeBlogOfId(blog.id))
     }
   }
 
@@ -34,33 +40,42 @@ const Blog = ({ user, blog, incrementLike, removeBlog }) => {
   }
 
   return (
-    <article style={blogStyle} className="blog">
+    <article style={blogStyle} className='blog'>
       <p style={{ margin: 0, display: 'inline' }}>
         {blog.title} - {blog.author}{' '}
       </p>
       {!showDetail && (
-        <button type="button" className="viewButton" onClick={() => toggleDetail()}>
+        <button
+          type='button'
+          className='viewButton'
+          onClick={() => toggleDetail()}
+        >
           view
         </button>
       )}
       {showDetail && (
-        <button type="button" className="hideButton" onClick={() => toggleDetail()}>
+        <button
+          type='button'
+          className='hideButton'
+          onClick={() => toggleDetail()}
+        >
           hide
         </button>
       )}
       {showDetail && (
-        <div className="blogDetail">
+        <div className='blogDetail'>
           <p style={{ margin: 0 }}>{blog.url}</p>
           <p style={{ margin: 0, display: 'inline' }}>likes: {blog.likes} </p>
-          <button type="button" className="likeButton" onClick={likeHandler}>
+          <button type='button' className='likeButton' onClick={likeHandler}>
             like
           </button>
           <p style={{ margin: 0 }}>{blog.user.name}</p>
           <button
-            type="button"
-            className="removeButton"
+            type='button'
+            className='removeButton'
             onClick={removeHandler}
-            disabled={!removable}>
+            disabled={!removable}
+          >
             remove
           </button>
         </div>
@@ -81,12 +96,11 @@ Blog.propTypes = {
     url: PropTypes.string,
     likes: PropTypes.number,
   }).isRequired,
-  incrementLike: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
 }
 
-const BlogForm = forwardRef(({ createBlog }, ref) => {
+const BlogForm = forwardRef(({ user }, ref) => {
   const [visible, setVisible] = useState(false)
+  const dispatch = useDispatch()
   const formRef = useRef(null)
 
   const hideWhenVisibleStyle = { display: visible ? 'none' : '' }
@@ -110,30 +124,55 @@ const BlogForm = forwardRef(({ createBlog }, ref) => {
     const author = formData.get('author')
     const url = formData.get('url')
 
-    await createBlog(title, author, url)
+    try {
+      dispatch(createBlog({ title, author, url }, user))
+
+      toggleVisibility()
+
+      dispatch(
+        pushNotification({
+          isError: false,
+          message: `Successfully added blog ${title}${
+            author.length > 0 ? ` by ${author}` : ''
+          }!`,
+        })
+      )
+    } catch (error) {
+      dispatch(
+        pushNotification({ isError: true, message: 'Failed adding a blog' })
+      )
+    }
   }
 
   return (
     <div>
-      <form ref={formRef} onSubmit={createBlogHandler} style={showWhenVisibleStyle}>
+      <form
+        ref={formRef}
+        onSubmit={createBlogHandler}
+        style={showWhenVisibleStyle}
+      >
         <div>
-          <label htmlFor="title">title:</label>
-          <input type="text" name="title" id="title" />
+          <label htmlFor='title'>title:</label>
+          <input type='text' name='title' id='title' />
         </div>
         <div>
-          <label htmlFor="author">author:</label>
-          <input type="text" name="author" id="author" />
+          <label htmlFor='author'>author:</label>
+          <input type='text' name='author' id='author' />
         </div>
         <div>
-          <label htmlFor="url">url:</label>
-          <input type="text" name="url" id="url" />
+          <label htmlFor='url'>url:</label>
+          <input type='text' name='url' id='url' />
         </div>
-        <button type="submit">create</button>
-        <button type="button" onClick={() => toggleVisibility()}>
+        <button type='submit'>create</button>
+        <button type='button' onClick={() => toggleVisibility()}>
           cancel
         </button>
       </form>
-      <button type="button" onClick={() => toggleVisibility()} style={hideWhenVisibleStyle}>
+      <button
+        type='button'
+        onClick={() => toggleVisibility()}
+        style={hideWhenVisibleStyle}
+      >
         new blog
       </button>
     </div>
@@ -141,47 +180,16 @@ const BlogForm = forwardRef(({ createBlog }, ref) => {
 })
 BlogForm.displayName = 'BlogForm'
 BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 }
 
-const Blogs = ({ blogs, setBlogs, user, setUser }) => {
-  const [notification, setNotification] = useState({ isError: false, message: null })
+const Blogs = ({ user, setUser }) => {
+  const blogs = useSelector(({ blogs }) => blogs)
+  console.log('blogs', blogs)
   const blogFormRef = useRef(null)
-
-  const createBlog = async (title, author, url) => {
-    try {
-      await blogService.create({ title, author, url })
-      const newBlogs = await blogService.getAll()
-
-      setBlogs(newBlogs)
-      blogFormRef.current.toggleVisibility()
-
-      setNotification({
-        isError: false,
-        message: `Successfully added blog ${title}${author.length > 0 ? ` by ${author}` : ''}!`,
-      })
-      setTimeout(() => {
-        setNotification({ isError: false, message: null })
-      }, 1500)
-    } catch (error) {
-      setNotification({ isError: true, message: 'Failed adding a blog' })
-      setTimeout(() => {
-        setNotification({ isError: false, message: null })
-      }, 5000)
-    }
-  }
-
-  const incrementLike = async (blogId) => {
-    await blogService.incrementLike(blogId)
-    const newBlogs = await blogService.getAll()
-    setBlogs(newBlogs)
-  }
-
-  const removeBlog = async (blogId) => {
-    await blogService.remove(blogId)
-    const newBlogs = await blogService.getAll()
-    setBlogs(newBlogs)
-  }
 
   const logoutHandler = () => {
     setUser(null)
@@ -191,21 +199,13 @@ const Blogs = ({ blogs, setBlogs, user, setUser }) => {
   return (
     <div>
       <h2>Blogs</h2>
-      <Notification isError={notification.isError} message={notification.message} />
-      <BlogForm createBlog={createBlog} ref={blogFormRef} />
+      <Notification />
+      <BlogForm ref={blogFormRef} user={user}  />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            user={user}
-            incrementLike={incrementLike}
-            removeBlog={removeBlog}
-          />
-        ))}
+      {blogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} user={user} />
+      ))}
     </div>
   )
 }
@@ -215,17 +215,6 @@ Blogs.propTypes = {
     username: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  blogs: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      user: PropTypes.object.isRequired,
-      title: PropTypes.string,
-      author: PropTypes.string,
-      url: PropTypes.string,
-      likes: PropTypes.number,
-    })
-  ),
-  setBlogs: PropTypes.func.isRequired,
   setUser: PropTypes.func.isRequired,
 }
 

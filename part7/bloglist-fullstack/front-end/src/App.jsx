@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Blogs } from './components/Blogs'
 import LoginForm from './components/LoginForm'
+import { initializeBlogs } from './reducers/blogReducer'
 import blogService from './services/blogs'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -17,7 +19,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    dispatch(initializeBlogs())
   }, [])
 
   return (
@@ -25,7 +27,7 @@ const App = () => {
       {user === null ? (
         <LoginForm setUser={setUser} />
       ) : (
-        <Blogs blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
+        <Blogs user={user} setUser={setUser} />
       )}
     </>
   )

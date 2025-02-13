@@ -24,11 +24,10 @@ const LoginForm = ({ setUser }) => {
           message: `Successfully logged in as ${username}!`,
         })
       )
-      setTimeout(() => {
-        setUsername('')
-        setPassword('')
-        setUser(user)
-      }, 5000)
+
+      setUsername('')
+      setPassword('')
+      setUser(user)
     } catch (error) {
       dispatch(
         pushNotification({

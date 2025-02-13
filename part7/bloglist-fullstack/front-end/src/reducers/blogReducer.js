@@ -11,7 +11,7 @@ const blogReducer = createSlice({
     appendBlog(state, action) {
       state.push(action.payload)
     },
-    removeBlogOfId(state, action) {
+    removeBlog(state, action) {
       const newBlogList = state.filter(blog => blog.id !== action.payload.id)
       return newBlogList
     },
@@ -19,10 +19,11 @@ const blogReducer = createSlice({
       const editedBlog = action.payload
       return state.map(blog => blog.id !== editedBlog.id ? blog : editedBlog)
     }
-  }
+  },
+  selectors: {}
 })
 
-const { setBlogs, appendBlog, removeBlogOfId, updateBlog } = blogReducer.actions
+const { setBlogs, appendBlog, removeBlog, updateBlog } = blogReducer.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -31,24 +32,24 @@ export const initializeBlogs = () => {
   }
 }
 
-export const createBlog = (blog) => {
+export const createBlog = (blog, user) => {
   return async (dispatch) => {
     const newBlog = await blogService.create(blog)
-    dispatch(appendBlog(newBlog))
+    dispatch(appendBlog({ ...newBlog, user: { username: user.username } }))
   }
 }
 
-export const removeBlog = (id) => {
+export const removeBlogOfId = (id) => {
   return async (dispatch) => {
     const response = await blogService.remove(id)
-    dispatch(removeBlogOfId({ id }))
+    dispatch(removeBlog({ id }))
   }
 }
 
-export const editBlog = (blog) => {
+export const incrementLike = (blog) => {
   return async (dispatch) => {
-    const editedBlog = await blogService.update(blog.id, blog)
-    dispatch(updateBlog(blog))
+    const editedBlog = await blogService.incrementLike(blog.id)
+    dispatch(updateBlog({ ...editedBlog, user: blog.user }))
   }
 }
 
