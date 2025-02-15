@@ -2,10 +2,8 @@ import PropTypes from 'prop-types'
 import { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { incrementLike, removeBlogOfId } from '../reducers/blogReducer'
-import { logoutUser } from '../reducers/userReducer'
-import Notification from './Notification'
 
-const Blog = ({ user, blog }) => {
+const Blog = ({ session, blog }) => {
   const [showDetail, setShowDetail] = useState(false)
   const dispatch = useDispatch()
 
@@ -28,7 +26,7 @@ const Blog = ({ user, blog }) => {
     }
   }
 
-  const removable = blog.user.username === user.username
+  const removable = blog.user.username === session.username
 
   const blogStyle = {
     paddingTop: 5,
@@ -38,7 +36,7 @@ const Blog = ({ user, blog }) => {
     marginBottom: 5,
   }
 
-  if(user.username === null || user.name === null){
+  if(session.username === null || session.name === null){
     return null
   }
 
@@ -87,7 +85,7 @@ const Blog = ({ user, blog }) => {
   )
 }
 Blog.propTypes = {
-  user: PropTypes.shape({
+  session: PropTypes.shape({
     username: PropTypes.string,
     name: PropTypes.string,
   }).isRequired,
@@ -102,18 +100,18 @@ Blog.propTypes = {
 }
 
 const BlogList = () => {
-  const user = useSelector(({ user }) => user)
+  const session = useSelector(({ session }) => session)
   const blogs = useSelector(({ blogs }) => blogs)
 
   const sortedBlogs = useMemo(
     () => [...blogs].sort((a, b) => b.likes - a.likes),
     [blogs]
   )
-  console.log(sortedBlogs)
+
   return (
     <div>
       {sortedBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} />
+        <Blog key={blog.id} blog={blog} session={session} />
       ))}
     </div>
   )

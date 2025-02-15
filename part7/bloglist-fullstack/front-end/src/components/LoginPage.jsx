@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { pushNotification } from '../reducers/notificationReducer'
-import { storeUser } from '../reducers/userReducer'
+import { saveSession } from '../reducers/sessionReducer'
 import loginService from '../services/login'
 import Notification from './Notification'
 
@@ -16,8 +16,8 @@ const LoginForm = () => {
   const loginHandler = async (e) => {
     e.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
-      dispatch(storeUser(user))
+      const session = await loginService.login({ username, password })
+      dispatch(saveSession(session))
       dispatch(
         pushNotification({
           isError: false,

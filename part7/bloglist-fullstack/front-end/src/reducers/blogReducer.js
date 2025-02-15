@@ -40,9 +40,9 @@ export const createBlog = (blog) => {
   return async (dispatch, getState) => {
     try {
       const newBlog = await blogService.create(blog)
-      const { user } = await getState()
-      console.log('createBlog', user)
-      dispatch(appendBlog({ ...newBlog, user: { name: user.name, username: user.username } }))
+      const { session } = await getState()
+      console.log('createBlog', session)
+      dispatch(appendBlog({ ...newBlog, user: { name: session.name, username: session.username } }))
       dispatch(
         pushNotification({
           isError: false,

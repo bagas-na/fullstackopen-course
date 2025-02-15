@@ -1,8 +1,18 @@
 
+
+const UsersTable = () => {
+
+}
+
 const UserList = () => {
+  
+
   return (
-    <div>Users</div>
+    <div>
+      <h2>Users</h2>
+      <UsersTable  />
+    </div>
   )
 }
 
-export { UserList }
+export default UserList

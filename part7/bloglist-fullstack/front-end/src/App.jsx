@@ -1,35 +1,33 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import LoginPage from './components/LoginPage'
 import MainPage from './components/MainPage'
+import UsersPage from './components/UsersPage'
 import { initializeBlogs } from './reducers/blogReducer'
-import { initializeUser } from './reducers/userReducer'
-import blogService from './services/blogs'
+import { initializeSession } from './reducers/sessionReducer'
 
 const App = () => {
-  const [isLoadingUser, setIsLoadingUser] = useState(true)
-  const user = useSelector(({ user }) => user)
+  const [isLoadingSession, setIsLoadingSession] = useState(true)
+  const session = useSelector(({ session }) => session)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
   useEffect(() => {
-    dispatch(initializeUser()).then(() => setIsLoadingUser(false))
+    dispatch(initializeSession()).then(() => setIsLoadingSession(false))
   }, [])
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [])
 
-  console.log(user)
-
-  if (isLoadingUser) {
+  if (isLoadingSession) {
     return null
   }
 
   return (
     <Routes>
       <Route path='/login' element={<LoginPage />} />
+      <Route path='/users' element={<UsersPage />} />
       <Route index={true} element={<MainPage />} />
     </Routes>
   )

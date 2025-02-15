@@ -3,7 +3,7 @@ import { forwardRef, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer'
 
-const BlogForm = forwardRef((props, ref) => {
+const BlogForm = () => {
   const [visible, setVisible] = useState(false)
   const dispatch = useDispatch()
   const formRef = useRef(null)
@@ -60,12 +60,12 @@ const BlogForm = forwardRef((props, ref) => {
       </button>
     </div>
   )
-})
-BlogForm.displayName = 'BlogForm'
+}
 BlogForm.propTypes = {
-  user: PropTypes.shape({
+  session: PropTypes.shape({
     username: PropTypes.string,
     name: PropTypes.string,
+    token: PropTypes.string
   }).isRequired,
 }
 
