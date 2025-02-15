@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
+import { pushNotification } from './notificationReducer'
 
 const blogReducer = createSlice({
   name: 'blogs',
@@ -20,22 +21,39 @@ const blogReducer = createSlice({
       return state.map(blog => blog.id !== editedBlog.id ? blog : editedBlog)
     }
   },
-  selectors: {}
 })
 
 const { setBlogs, appendBlog, removeBlog, updateBlog } = blogReducer.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
-    const blogList = await blogService.getAll()
-    dispatch(setBlogs(blogList))
+    try {
+      const blogList = await blogService.getAll()
+      dispatch(setBlogs(blogList))
+    } catch (error) {
+      dispatch(pushNotification({ message: 'Error initializing blogs', isError: true }))
+    }
   }
 }
 
-export const createBlog = (blog, user) => {
-  return async (dispatch) => {
-    const newBlog = await blogService.create(blog)
-    dispatch(appendBlog({ ...newBlog, user: { username: user.username } }))
+export const createBlog = (blog) => {
+  return async (dispatch, getState) => {
+    try {
+      const newBlog = await blogService.create(blog)
+      const { user } = await getState()
+      console.log('createBlog', user)
+      dispatch(appendBlog({ ...newBlog, user: { name: user.name, username: user.username } }))
+      dispatch(
+        pushNotification({
+          isError: false,
+          message: `Successfully added blog ${blog.title}${blog.author.length > 0 ? ` by ${blog.author}` : ''}!`,
+        })
+      )
+    } catch (error) {
+      dispatch(
+        pushNotification({ isError: true, message: 'Failed adding a blog' })
+      )
+    }
   }
 }
 

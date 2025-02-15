@@ -2,11 +2,11 @@ import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { pushNotification } from '../reducers/notificationReducer'
-import blogService from '../services/blogs'
+import { storeUser } from '../reducers/userReducer'
 import loginService from '../services/login'
 import Notification from './Notification'
 
-const LoginForm = ({ setUser }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
@@ -15,19 +15,15 @@ const LoginForm = ({ setUser }) => {
     e.preventDefault()
     try {
       const user = await loginService.login({ username, password })
-
-      blogService.setToken(user.token)
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+      dispatch(storeUser(user))
       dispatch(
         pushNotification({
           isError: false,
           message: `Successfully logged in as ${username}!`,
         })
       )
-
       setUsername('')
       setPassword('')
-      setUser(user)
     } catch (error) {
       dispatch(
         pushNotification({
@@ -39,37 +35,39 @@ const LoginForm = ({ setUser }) => {
   }
 
   return (
+    <form onSubmit={loginHandler}>
+      <div>
+        <label htmlFor='username'>username</label>
+        <input
+          type='text'
+          id='username'
+          name='Username'
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor='password'>password</label>
+        <input
+          type='password'
+          id='password'
+          name='Password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <button type='submit'>login</button>
+    </form>
+  )
+}
+
+const LoginPage = () => {
+  return (
     <div>
       <h2>Log in to Application</h2>
       <Notification />
-      <form onSubmit={loginHandler}>
-        <div>
-          <label htmlFor='username'>username</label>
-          <input
-            type='text'
-            id='username'
-            name='Username'
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor='password'>password</label>
-          <input
-            type='password'
-            id='password'
-            name='Password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type='submit'>login</button>
-      </form>
+      <LoginForm />
     </div>
   )
 }
-LoginForm.propTypes = {
-  setUser: PropTypes.func.isRequired,
-}
-
-export default LoginForm
+export default LoginPage

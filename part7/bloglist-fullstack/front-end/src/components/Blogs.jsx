@@ -1,9 +1,18 @@
 import PropTypes from 'prop-types'
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createBlog, incrementLike, removeBlogOfId } from '../reducers/blogReducer'
-import { pushNotification } from '../reducers/notificationReducer'
-import blogService from '../services/blogs'
+import {
+  createBlog,
+  incrementLike,
+  removeBlogOfId,
+} from '../reducers/blogReducer'
+import { logoutUser } from '../reducers/userReducer'
 import Notification from './Notification'
 
 const Blog = ({ user, blog }) => {
@@ -98,7 +107,7 @@ Blog.propTypes = {
   }).isRequired,
 }
 
-const BlogForm = forwardRef(({ user }, ref) => {
+const BlogForm = forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false)
   const dispatch = useDispatch()
   const formRef = useRef(null)
@@ -124,24 +133,8 @@ const BlogForm = forwardRef(({ user }, ref) => {
     const author = formData.get('author')
     const url = formData.get('url')
 
-    try {
-      dispatch(createBlog({ title, author, url }, user))
-
-      toggleVisibility()
-
-      dispatch(
-        pushNotification({
-          isError: false,
-          message: `Successfully added blog ${title}${
-            author.length > 0 ? ` by ${author}` : ''
-          }!`,
-        })
-      )
-    } catch (error) {
-      dispatch(
-        pushNotification({ isError: true, message: 'Failed adding a blog' })
-      )
-    }
+    dispatch(createBlog({ title, author, url }))
+    toggleVisibility()
   }
 
   return (
@@ -186,36 +179,35 @@ BlogForm.propTypes = {
   }).isRequired,
 }
 
-const Blogs = ({ user, setUser }) => {
+const Blogs = () => {
+  const user = useSelector(({ user }) => user)
   const blogs = useSelector(({ blogs }) => blogs)
-  console.log('blogs', blogs)
+  const dispatch = useDispatch()
   const blogFormRef = useRef(null)
 
+  const sortedBlogs = useMemo(
+    () => [...blogs].sort((a, b) => b.likes - a.likes),
+    [blogs]
+  )
+
   const logoutHandler = () => {
-    setUser(null)
-    window.localStorage.removeItem('loggedBlogAppUser')
+    dispatch(logoutUser())
   }
+
+  console.log(sortedBlogs)
 
   return (
     <div>
       <h2>Blogs</h2>
       <Notification />
-      <BlogForm ref={blogFormRef} user={user}  />
+      <BlogForm ref={blogFormRef} user={user} />
       <p>{user.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
-      {blogs.map((blog) => (
+      {sortedBlogs.map((blog) => (
         <Blog key={blog.id} blog={blog} user={user} />
       ))}
     </div>
   )
-}
-
-Blogs.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  setUser: PropTypes.func.isRequired,
 }
 
 export { Blog, BlogForm, Blogs }
