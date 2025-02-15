@@ -1,17 +1,7 @@
 import PropTypes from 'prop-types'
-import {
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  createBlog,
-  incrementLike,
-  removeBlogOfId,
-} from '../reducers/blogReducer'
+import { incrementLike, removeBlogOfId } from '../reducers/blogReducer'
 import { logoutUser } from '../reducers/userReducer'
 import Notification from './Notification'
 
@@ -46,6 +36,10 @@ const Blog = ({ user, blog }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
+  }
+
+  if(user.username === null || user.name === null){
+    return null
   }
 
   return (
@@ -94,8 +88,8 @@ const Blog = ({ user, blog }) => {
 }
 Blog.propTypes = {
   user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
+    username: PropTypes.string,
+    name: PropTypes.string,
   }).isRequired,
   blog: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -107,102 +101,17 @@ Blog.propTypes = {
   }).isRequired,
 }
 
-const BlogForm = forwardRef((props, ref) => {
-  const [visible, setVisible] = useState(false)
-  const dispatch = useDispatch()
-  const formRef = useRef(null)
-
-  const hideWhenVisibleStyle = { display: visible ? 'none' : '' }
-  const showWhenVisibleStyle = { display: visible ? '' : 'none' }
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
-
-  useImperativeHandle(ref, () => {
-    return {
-      toggleVisibility,
-    }
-  })
-
-  const createBlogHandler = async (e) => {
-    e.preventDefault()
-
-    const formData = new FormData(formRef.current)
-    const title = formData.get('title')
-    const author = formData.get('author')
-    const url = formData.get('url')
-
-    dispatch(createBlog({ title, author, url }))
-    toggleVisibility()
-  }
-
-  return (
-    <div>
-      <form
-        ref={formRef}
-        onSubmit={createBlogHandler}
-        style={showWhenVisibleStyle}
-      >
-        <div>
-          <label htmlFor='title'>title:</label>
-          <input type='text' name='title' id='title' />
-        </div>
-        <div>
-          <label htmlFor='author'>author:</label>
-          <input type='text' name='author' id='author' />
-        </div>
-        <div>
-          <label htmlFor='url'>url:</label>
-          <input type='text' name='url' id='url' />
-        </div>
-        <button type='submit'>create</button>
-        <button type='button' onClick={() => toggleVisibility()}>
-          cancel
-        </button>
-      </form>
-      <button
-        type='button'
-        onClick={() => toggleVisibility()}
-        style={hideWhenVisibleStyle}
-      >
-        new blog
-      </button>
-    </div>
-  )
-})
-BlogForm.displayName = 'BlogForm'
-BlogForm.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-}
-
-const Blogs = () => {
+const BlogList = () => {
   const user = useSelector(({ user }) => user)
   const blogs = useSelector(({ blogs }) => blogs)
-  const dispatch = useDispatch()
-  const blogFormRef = useRef(null)
 
   const sortedBlogs = useMemo(
     () => [...blogs].sort((a, b) => b.likes - a.likes),
     [blogs]
   )
-
-  const logoutHandler = () => {
-    dispatch(logoutUser())
-  }
-
   console.log(sortedBlogs)
-
   return (
     <div>
-      <h2>Blogs</h2>
-      <Notification />
-      <BlogForm ref={blogFormRef} user={user} />
-      <p>{user.name} logged in.</p>
-      <button onClick={() => logoutHandler()}>log out</button>
       {sortedBlogs.map((blog) => (
         <Blog key={blog.id} blog={blog} user={user} />
       ))}
@@ -210,4 +119,4 @@ const Blogs = () => {
   )
 }
 
-export { Blog, BlogForm, Blogs }
+export default BlogList

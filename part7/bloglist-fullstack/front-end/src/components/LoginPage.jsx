@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { pushNotification } from '../reducers/notificationReducer'
 import { storeUser } from '../reducers/userReducer'
 import loginService from '../services/login'
@@ -10,6 +11,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const loginHandler = async (e) => {
     e.preventDefault()
@@ -24,6 +26,7 @@ const LoginForm = () => {
       )
       setUsername('')
       setPassword('')
+      navigate('/')
     } catch (error) {
       dispatch(
         pushNotification({
