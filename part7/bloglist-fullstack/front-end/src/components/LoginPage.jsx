@@ -28,6 +28,16 @@ const LoginForm = () => {
       setPassword('')
       navigate('/')
     } catch (error) {
+      if (error.response.status === 500) {
+        dispatch(
+          pushNotification({
+            isError: true,
+            message: 'An error has occured',
+          })
+        )
+        return
+      }
+
       dispatch(
         pushNotification({
           isError: true,
