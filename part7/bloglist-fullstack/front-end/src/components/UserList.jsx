@@ -27,11 +27,6 @@ User.propTypes = {
 
 const UserList = () => {
   const usersData = useSelector(({ users }) => users)
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(initializeUsers())
-  }, [dispatch])
 
   console.log('users', usersData)
 

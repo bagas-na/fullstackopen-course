@@ -102,11 +102,6 @@ Blog.propTypes = {
 const BlogList = () => {
   const session = useSelector(({ session }) => session)
   const blogs = useSelector(({ blogs }) => blogs)
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(initializeBlogs())
-  }, [dispatch])
 
   const sortedBlogs = useMemo(
     () => [...blogs].sort((a, b) => b.likes - a.likes),
