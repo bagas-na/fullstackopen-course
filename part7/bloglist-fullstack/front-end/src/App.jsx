@@ -16,7 +16,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeSession()).then(() => setIsLoadingSession(false))
-  }, [])
+  }, [dispatch])
 
   if (isLoadingSession) {
     return null

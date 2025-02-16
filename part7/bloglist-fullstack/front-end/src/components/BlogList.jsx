@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { incrementLike, removeBlogOfId } from '../reducers/blogReducer'
+import { incrementLike, initializeBlogs, removeBlogOfId } from '../reducers/blogReducer'
 
 const Blog = ({ session, blog }) => {
   const [showDetail, setShowDetail] = useState(false)
@@ -36,7 +36,7 @@ const Blog = ({ session, blog }) => {
     marginBottom: 5,
   }
 
-  if(session.username === null || session.name === null){
+  if (session.username === null || session.name === null) {
     return null
   }
 
@@ -102,11 +102,18 @@ Blog.propTypes = {
 const BlogList = () => {
   const session = useSelector(({ session }) => session)
   const blogs = useSelector(({ blogs }) => blogs)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   const sortedBlogs = useMemo(
     () => [...blogs].sort((a, b) => b.likes - a.likes),
     [blogs]
   )
+
+  console.log('blogs', sortedBlogs)
 
   return (
     <div>

@@ -1,27 +1,40 @@
 import PropTypes from 'prop-types'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { initializeUsers } from '../reducers/userReducer'
 
 const User = ({ user }) => {
   return (
     <tr>
       <td>{user.name}</td>
-      <td>{user.blogs}</td>
+      <td>{user.blogs.length}</td>
     </tr>
   )
 }
 User.propTypes = {
   user: PropTypes.shape({
+    id: PropTypes.string,
     name: PropTypes.string,
-    blogs: PropTypes.number
-  })
+    username: PropTypes.string,
+    blogs: PropTypes.arrayOf(PropTypes.shape({
+      author: PropTypes.string,
+      id: PropTypes.string,
+      likes: PropTypes.number,
+      url: PropTypes.string,
+    }))
+  }),
 }
 
-const data = [
-  { name: 'Arto Hellas', blogs: 6 },
-  { name: 'Matti Luukkainen', blogs: 0 },
-  { name: 'Venla Ruuska', blogs: 0 },
-]
-
 const UserList = () => {
+  const usersData = useSelector(({ users }) => users)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(initializeUsers())
+  }, [dispatch])
+
+  console.log('users', usersData)
+
   return (
     <div>
       <table>
@@ -32,8 +45,8 @@ const UserList = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((user) => (
-            <User key={user.name} user={user} />
+          {usersData.map((user) => (
+            <User key={user.id} user={user} />
           ))}
         </tbody>
       </table>
