@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { initializeUsers } from '../reducers/userReducer'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 const User = ({ user }) => {
   return (
     <tr>
-      <td>{user.name}</td>
+      <td>
+        <Link to={user.id}>{user.name}</Link>
+      </td>
       <td>{user.blogs.length}</td>
     </tr>
   )
@@ -16,19 +17,19 @@ User.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     username: PropTypes.string,
-    blogs: PropTypes.arrayOf(PropTypes.shape({
-      author: PropTypes.string,
-      id: PropTypes.string,
-      likes: PropTypes.number,
-      url: PropTypes.string,
-    }))
+    blogs: PropTypes.arrayOf(
+      PropTypes.shape({
+        author: PropTypes.string,
+        id: PropTypes.string,
+        likes: PropTypes.number,
+        url: PropTypes.string,
+      })
+    ),
   }),
 }
 
 const UserList = () => {
   const usersData = useSelector(({ users }) => users)
-
-  console.log('users', usersData)
 
   return (
     <div>

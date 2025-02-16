@@ -108,8 +108,6 @@ const BlogList = () => {
     [blogs]
   )
 
-  console.log('blogs', sortedBlogs)
-
   return (
     <div>
       {sortedBlogs.map((blog) => (

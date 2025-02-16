@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 import BlogList from './components/BlogList'
 import Layout from './components/Layout'
 import LoginPage from './components/LoginPage'
-import MainPage from './components/MainPage'
+import UserDetail from './components/UserDetail'
 import UserList from './components/UserList'
-import UsersPage from './components/UsersPage'
-import { initializeBlogs } from './reducers/blogReducer'
 import { initializeSession } from './reducers/sessionReducer'
 
 const App = () => {
@@ -28,6 +26,7 @@ const App = () => {
       <Route element={<Layout />}>
         <Route index={true} element={<BlogList />} />
         <Route path='/users' element={<UserList />} />
+        <Route path='/users/:id' element={<UserDetail />} />
       </Route>
     </Routes>
   )
