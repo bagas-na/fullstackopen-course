@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { logoutSession } from '../reducers/sessionReducer'
 import BlogForm from './BlogForm'
+import Navbar from './Navbar'
 import Notification from './Notification'
 
 const Layout = () => {
@@ -24,6 +25,7 @@ const Layout = () => {
 
   return (
     <div>
+      <Navbar/>
       <h2>Blog app</h2>
       <Notification />
       <BlogForm session={session} />
