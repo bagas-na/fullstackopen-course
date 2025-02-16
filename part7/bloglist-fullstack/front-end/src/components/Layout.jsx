@@ -1,15 +1,22 @@
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { initializeBlogs } from '../reducers/blogReducer'
 import { logoutSession } from '../reducers/sessionReducer'
 import BlogForm from './BlogForm'
 import Notification from './Notification'
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const session = useSelector(({ session }) => session)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [])
+
+
 
   const logoutHandler = () => {
     dispatch(logoutSession())
@@ -29,7 +36,7 @@ const Layout = ({ children }) => {
       <BlogForm session={session} />
       <p>{session.name} logged in.</p>
       <button onClick={() => logoutHandler()}>log out</button>
-      {children}
+      <Outlet />
     </div>
   )
 }
