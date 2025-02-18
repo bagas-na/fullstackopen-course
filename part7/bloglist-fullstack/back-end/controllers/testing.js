@@ -97,7 +97,12 @@ router.post('/populate-with-comments', async (request, response) => {
     const mockBlogsWithComments = mockBlogs.map((blog, index) => {
       const comments = []
       for (let i = 0; i < commentCounts[index]; i++) {
-        comments.push(mockComments[randInt(mockComments.length - 1)])
+        let newComment = mockComments[randInt(mockComments.length - 1)]
+
+        while(comments.includes(newComment)) {
+          newComment = mockComments[randInt(mockComments.length - 1)]
+        }
+        comments.push(newComment)
       }
       return { ...blog, comments }
     })
