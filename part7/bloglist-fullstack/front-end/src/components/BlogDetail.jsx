@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { incrementLike } from '../reducers/blogReducer'
 
 const BlogDetail = () => {
@@ -22,15 +22,18 @@ const BlogDetail = () => {
       <h2>
         {blog.title} by {blog.author}
       </h2>
-      <h3>added blogs:</h3>
       <div>
         <p style={{ margin: 0 }}>{blog.url}</p>
         <div>
           <p style={{ margin: 0, display: 'inline' }}>{blog.likes} likes</p>
           <button style={{ margin: 6 }} onClick={likeHandler}>like</button>
         </div>
-        <p style={{ margin: 0 }}>added by {blog.user.name}</p>
+        <p style={{ margin: 0 }}>added by <Link to={`/users/${blog.user.id}`} >{blog.user.name}</Link></p>
       </div>
+      <h3 style={{ marginBottom: '0.5rem' }}>comments:</h3>
+      {blog.comments.length > 0 ? (
+        <ul style={{ margin: 0 }}>{blog.comments.map(comment => <li key={comment}>{comment}</li>)}</ul>
+      ): <p>No comments has been added</p>}
     </div>
   )
 }
