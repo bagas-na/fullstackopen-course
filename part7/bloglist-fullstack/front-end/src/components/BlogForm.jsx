@@ -28,7 +28,7 @@ const BlogForm = () => {
   }
 
   return (
-    <div>
+    <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
       <form
         ref={formRef}
         onSubmit={createBlogHandler}
@@ -65,7 +65,7 @@ BlogForm.propTypes = {
   session: PropTypes.shape({
     username: PropTypes.string,
     name: PropTypes.string,
-    token: PropTypes.string
+    token: PropTypes.string,
   }).isRequired,
 }
 

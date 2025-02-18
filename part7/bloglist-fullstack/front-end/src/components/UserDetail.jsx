@@ -5,9 +5,6 @@ const UserDetail = () => {
   const params = useParams()
   const user = useSelector(({ users }) => users.find(user => user.id === params.id))
 
-  console.log(params.id)
-  console.log(user)
-
   if (!user) {
     return null
   }
