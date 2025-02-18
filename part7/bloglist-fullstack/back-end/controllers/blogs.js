@@ -56,6 +56,55 @@ blogsRouter.post('/',
     }
   })
 
+blogsRouter.post('/:id/comments',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const contentType = request.get('Content-type')
+    if (!contentType.includes('application/json')) {
+      response.status(415).send({
+        error: 'Unsupported Media Type',
+        message: `Expected Content-Type: application/json, but received ${contentType}`
+      })
+      return
+    }
+
+    if (request.token === null) {
+      response.status(401).json({ error: 'token required' })
+      return
+    }
+
+    if (request.body.comment === undefined || request.body.comment === null) {
+      response.status(400).send({
+        error: 'Unexpected json format',
+        message: 'json must contain comment.'
+      })
+      return
+    }
+
+    const blogId = request.params.id
+
+    try {
+      const { comment } = request.body
+
+      const blog = await Blog.findById(blogId)
+      const updatedBlog = {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes + 1,
+        user: blog.user.toString(),
+        comments: blog.comments.concat(comment)
+      }
+
+      const result = await Blog.findByIdAndUpdate(blogId, updatedBlog, { new: true })
+      response.status(200).json(result)
+
+    } catch (error) {
+      logger.error('error updating blog to database')
+      next(error)
+    }
+  })
+
 blogsRouter.delete('/:id',
   middleware.userExtractor,
   async (request, response, next) => {
