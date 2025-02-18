@@ -47,4 +47,13 @@ const incrementLike = async (id) => {
   return response.data
 }
 
-export default { getAll, create, update, remove, setToken, incrementLike }
+const addComment = async(blogId, comment) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  const response = await axios.post(`${baseUrl}/${blogId}/comments`, { comment }, config)
+  return response.data
+}
+
+export default { getAll, create, update, remove, setToken, incrementLike, addComment }

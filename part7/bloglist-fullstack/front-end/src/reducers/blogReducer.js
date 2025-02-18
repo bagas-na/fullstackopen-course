@@ -67,7 +67,20 @@ export const removeBlogOfId = (id) => {
 export const incrementLike = (blog) => {
   return async (dispatch) => {
     const editedBlog = await blogService.incrementLike(blog.id)
+
+    // user: blog.user is needed because JSON returned by mongoose does not
+    // populate 'user' field, only the userId
     dispatch(updateBlog({ ...editedBlog, user: blog.user }))
+  }
+}
+
+export const addCommentOfBlog = (blog, comment) => {
+  return async (dispatch) => {
+    const commentedBlog = await blogService.addComment(blog.id, comment)
+
+    // user: blog.user is needed because JSON returned by mongoose does not
+    // populate 'user' field, only the userId
+    dispatch(updateBlog({ ...commentedBlog, user: blog.user }))
   }
 }
 
