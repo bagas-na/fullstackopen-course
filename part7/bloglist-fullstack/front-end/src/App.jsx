@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
+import BlogDetail from './components/BlogDetail'
 import BlogList from './components/BlogList'
 import Layout from './components/Layout'
 import LoginPage from './components/LoginPage'
@@ -25,6 +26,7 @@ const App = () => {
       <Route path='/login' element={<LoginPage />} />
       <Route element={<Layout />}>
         <Route index={true} element={<BlogList />} />
+        <Route path='blogs/:id' element={<BlogDetail />} />
         <Route path='/users' element={<UserList />} />
         <Route path='/users/:id' element={<UserDetail />} />
       </Route>
