@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { incrementLike, initializeBlogs, removeBlogOfId } from '../reducers/blogReducer'
+import { Link } from 'react-router-dom'
+import { incrementLike, removeBlogOfId } from '../reducers/blogReducer'
 
 const Blog = ({ session, blog }) => {
   const [showDetail, setShowDetail] = useState(false)
@@ -99,6 +100,37 @@ Blog.propTypes = {
   }).isRequired,
 }
 
+const BlogLink = ({ blog }) => {
+  const style = {
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
+  }
+
+  return (
+    <div style={style} className='blog'>
+      <p style={{ margin: 0, display: 'inline' }}>
+        <Link to={`/blogs/${blog.id}`}>
+          {blog.title} - {blog.author}{' '}
+        </Link>
+      </p>
+    </div>
+  )
+}
+BlogLink.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    user: PropTypes.object.isRequired,
+    title: PropTypes.string,
+    author: PropTypes.string,
+    url: PropTypes.string,
+    likes: PropTypes.number,
+  }).isRequired,
+}
+
 const BlogList = () => {
   const session = useSelector(({ session }) => session)
   const blogs = useSelector(({ blogs }) => blogs)
@@ -111,7 +143,7 @@ const BlogList = () => {
   return (
     <div>
       {sortedBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} session={session} />
+        <BlogLink key={blog.id} blog={blog} session={session} />
       ))}
     </div>
   )
