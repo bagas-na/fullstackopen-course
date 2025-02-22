@@ -1,33 +1,36 @@
 import { useEffect, useState } from 'react'
-import { Blogs } from './components/Blogs'
-import LoginForm from './components/LoginForm'
-import blogService from './services/blogs'
+import { useDispatch } from 'react-redux'
+import { Route, Routes } from 'react-router-dom'
+import BlogDetail from './components/BlogDetail'
+import BlogList from './components/BlogList'
+import Layout from './components/Layout'
+import LoginPage from './components/LoginPage'
+import UserDetail from './components/UserDetail'
+import UserList from './components/UserList'
+import { initializeSession } from './reducers/sessionReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
+  const [isLoadingSession, setIsLoadingSession] = useState(true)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-    if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON)
-      setUser(loggedUser)
-      blogService.setToken(loggedUser.token)
-    }
-  }, [])
+    dispatch(initializeSession()).then(() => setIsLoadingSession(false))
+  }, [dispatch])
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  if (isLoadingSession) {
+    return null
+  }
 
   return (
-    <>
-      {user === null ? (
-        <LoginForm setUser={setUser} />
-      ) : (
-        <Blogs blogs={blogs} setBlogs={setBlogs} user={user} setUser={setUser} />
-      )}
-    </>
+    <Routes>
+      <Route path='/login' element={<LoginPage />} />
+      <Route element={<Layout />}>
+        <Route index={true} element={<BlogList />} />
+        <Route path='blogs/:id' element={<BlogDetail />} />
+        <Route path='/users' element={<UserList />} />
+        <Route path='/users/:id' element={<UserDetail />} />
+      </Route>
+    </Routes>
   )
 }
 
