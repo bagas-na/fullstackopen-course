@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { forwardRef, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer'
+import { Button } from './ui/button'
 
 const BlogForm = () => {
   const [visible, setVisible] = useState(false)
@@ -28,36 +29,40 @@ const BlogForm = () => {
   }
 
   return (
-    <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+    <div className='my-4'>
       <form
         ref={formRef}
         onSubmit={createBlogHandler}
         style={showWhenVisibleStyle}
+        className='p-4 space-y-3 max-w-xs shadow-md'
       >
-        <div>
-          <label htmlFor='title'>title:</label>
-          <input type='text' name='title' id='title' />
+        <div className='flex *:flex-1'>
+          <label htmlFor='title'>Title:</label>
+          <input type='text' name='title' id='title' className='border shadow-inner'/>
         </div>
-        <div>
-          <label htmlFor='author'>author:</label>
-          <input type='text' name='author' id='author' />
+        <div className='flex *:flex-1'>
+          <label htmlFor='author'>Author:</label>
+          <input type='text' name='author' id='author' className='border shadow-inner'/>
         </div>
-        <div>
-          <label htmlFor='url'>url:</label>
-          <input type='text' name='url' id='url' />
+        <div className='flex *:flex-1'>
+          <label htmlFor='url'>Url:</label>
+          <input type='text' name='url' id='url' className='border shadow-inner'/>
         </div>
-        <button type='submit'>create</button>
-        <button type='button' onClick={() => toggleVisibility()}>
-          cancel
-        </button>
+        <div className='space-x-3'>
+          <Button type='submit'>create</Button>
+          <Button variant='destructive' type='button' onClick={() => toggleVisibility()}>
+            cancel
+          </Button>
+        </div>
       </form>
-      <button
-        type='button'
+      <Button
+        variant='default'
+        size='sm'
         onClick={() => toggleVisibility()}
         style={hideWhenVisibleStyle}
       >
-        new blog
-      </button>
+        New Blog
+      </Button>
     </div>
   )
 }

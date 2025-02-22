@@ -42,8 +42,8 @@ const Blog = ({ session, blog }) => {
   }
 
   return (
-    <article style={blogStyle} className='blog'>
-      <p style={{ margin: 0, display: 'inline' }}>
+    <article className='p-1 border border-solid shadow-sm'>
+      <p className='m-0 inline'>
         {blog.title} - {blog.author}{' '}
       </p>
       {!showDetail && (
@@ -67,7 +67,7 @@ const Blog = ({ session, blog }) => {
       {showDetail && (
         <div className='blogDetail'>
           <p style={{ margin: 0 }}>{blog.url}</p>
-          <p style={{ margin: 0, display: 'inline' }}>likes: {blog.likes} </p>
+          <p className='m-0 inline'>likes: {blog.likes} </p>
           <button type='button' className='likeButton' onClick={likeHandler}>
             like
           </button>
@@ -111,9 +111,9 @@ const BlogLink = ({ blog }) => {
   }
 
   return (
-    <div style={style} className='blog'>
-      <p style={{ margin: 0, display: 'inline' }}>
-        <Link to={`/blogs/${blog.id}`}>
+    <div className='py-1.5 px-3 border border-solid shadow-sm'>
+      <p className='m-0 inline text-sm'>
+        <Link to={`/blogs/${blog.id}`} className='hover:underline underline-offset-2'>
           {blog.title} - {blog.author}{' '}
         </Link>
       </p>
@@ -141,7 +141,7 @@ const BlogList = () => {
   )
 
   return (
-    <div>
+    <div className='space-y-2'>
       {sortedBlogs.map((blog) => (
         <BlogLink key={blog.id} blog={blog} session={session} />
       ))}

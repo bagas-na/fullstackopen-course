@@ -24,12 +24,15 @@ const Layout = () => {
   }, [navigate, session.token])
 
   return (
-    <div>
+    <div className='bg-zinc-50 h-screen w-screen'>
       <Navbar/>
-      <h2>Blog app</h2>
-      <Notification />
-      <BlogForm session={session} />
-      <Outlet />
+      <div className="h-12"></div>
+      <div className='max-w-4xl mx-auto'>
+        <h2 className='text-4xl'>Fullstack Open - Blog app</h2>
+        <Notification />
+        <BlogForm session={session} />
+        <Outlet />
+      </div>
     </div>
   )
 }
