@@ -27,7 +27,7 @@ const Layout = () => {
     <div className='bg-zinc-50 h-screen w-screen'>
       <Navbar/>
       <div className="h-12"></div>
-      <div className='max-w-4xl mx-auto'>
+      <div className='max-w-4xl mx-auto px-1.5'>
         <h2 className='text-4xl'>Fullstack Open - Blog app</h2>
         <Notification />
         <BlogForm session={session} />

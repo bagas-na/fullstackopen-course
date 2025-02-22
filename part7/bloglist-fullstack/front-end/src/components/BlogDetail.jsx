@@ -36,7 +36,7 @@ const CommentForm = () => {
   }
 
   return (
-    <form onSubmit={submitHandler} className='ml-6 space-x-2'>
+    <form onSubmit={submitHandler} className='pl-6 w-full max-w-md flex gap-2'>
       <input
         type='text'
         name='comment'
@@ -44,7 +44,7 @@ const CommentForm = () => {
         placeholder='write your comment here...'
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className='w-80 px-2 py-1 shadow-inner border'
+        className='w-80 px-2 py-1 shadow-inner border flex-auto'
       />
       <Button type='submit' size='sm'>
         add comment

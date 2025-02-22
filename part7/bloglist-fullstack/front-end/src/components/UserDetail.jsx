@@ -7,7 +7,7 @@ const BlogList = ({ blogs }) => {
     <ul>
       {blogs.map((blog) => (
         <li key={blog.id}>
-          <Link to={`/blogs/${blog.id}`}>
+          <Link to={`/blogs/${blog.id}`} className='hover:underline underline-offset-1'>
             {blog.title}
             {blog.author && ` -- ${blog.author}`}
           </Link>
@@ -37,9 +37,9 @@ const UserDetail = () => {
   }
 
   return (
-    <div>
-      <h2>{user.name}</h2>
-      <h3>added blogs:</h3>
+    <div className='space-y-2'>
+      <h2 className='text-2xl'>{user.name}</h2>
+      <h3 className='font-medium mb-2'>added blogs:</h3>
       {user.blogs.length > 0
         ? <BlogList blogs={user.blogs} />
         :<p>This user has not added any blogs</p>

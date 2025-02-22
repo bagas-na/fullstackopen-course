@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 
 const User = ({ user }) => {
   return (
-    <tr>
+    <tr className=''>
       <td>
-        <Link to={user.id}>{user.name}</Link>
+        <Link to={user.id} className='hover:underline underline-offset-2'>{user.name}</Link>
       </td>
-      <td>{user.blogs.length}</td>
+      <td className='text-center'>{user.blogs.length}</td>
     </tr>
   )
 }
@@ -33,7 +33,7 @@ const UserList = () => {
 
   return (
     <div>
-      <table>
+      <table className='w-full max-w-xs'>
         <thead>
           <tr>
             <th></th>
