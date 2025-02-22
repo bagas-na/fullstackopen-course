@@ -3,12 +3,15 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import { addCommentOfBlog, incrementLike } from '../reducers/blogReducer'
+import { Button } from './ui/button'
 
 const CommentList = ({ comments }) => {
   return (
-    <ul style={{ margin: 0 }}>
+    <ul className='pl-6 py-2 space-y-1'>
       {comments.map((comment) => (
-        <li key={comment}>{comment}</li>
+        <li key={comment} className='list-disc'>
+          {comment}
+        </li>
       ))}
     </ul>
   )
@@ -33,7 +36,7 @@ const CommentForm = () => {
   }
 
   return (
-    <form onSubmit={submitHandler}>
+    <form onSubmit={submitHandler} className='ml-6 space-x-2'>
       <input
         type='text'
         name='comment'
@@ -41,8 +44,11 @@ const CommentForm = () => {
         placeholder='write your comment here...'
         value={comment}
         onChange={(e) => setComment(e.target.value)}
+        className='w-80 px-2 py-1 shadow-inner border'
       />
-      <button type='submit'>add comment</button>
+      <Button type='submit' size='sm'>
+        add comment
+      </Button>
     </form>
   )
 }
@@ -64,22 +70,32 @@ const BlogDetail = () => {
 
   return (
     <div>
-      <h2>
+      <h2 className='text-2xl'>
         {blog.title} by {blog.author}
       </h2>
       <div>
-        <p style={{ margin: 0 }}>{blog.url}</p>
-        <div>
-          <p style={{ margin: 0, display: 'inline' }}>{blog.likes} likes</p>
-          <button style={{ margin: 6 }} onClick={likeHandler}>
-            like
-          </button>
+        <p className='text-xs italic hover:cursor-pointer'>{blog.url}</p>
+        <div className='my-4 space-x-4'>
+          <p className='inline'>{blog.likes} likes</p>
+          <Button
+            variant='outline'
+            className='px-2 py-1 h-6'
+            onClick={likeHandler}
+          >
+            Like
+          </Button>
         </div>
-        <p style={{ margin: 0 }}>
-          added by <Link to={`/users/${blog.user.id}`}>{blog.user.name}</Link>
+        <p className='my-4'>
+          added by{' '}
+          <Link
+            to={`/users/${blog.user.id}`}
+            className='hover:underline underline-offset-2'
+          >
+            {blog.user.name}
+          </Link>
         </p>
       </div>
-      <h3 style={{ marginBottom: '0.5rem' }}>comments:</h3>
+      <h3 className='font-medium mb-2'>Comments:</h3>
       <CommentForm />
       {blog.comments.length > 0 ? (
         <CommentList comments={blog.comments} />
