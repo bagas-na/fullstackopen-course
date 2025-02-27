@@ -1,7 +1,7 @@
-import path from 'path';
-import { isNotNumber } from "./utils/parser.ts";
+import path from "path";
+import { isNotNumber } from "./utils/parser";
 
-const currentFileName = path.basename(process.argv[1])
+const currentFileName = path.basename(process.argv[1]);
 
 // Calculates BMI (kg/m2) using height (in cm) and mass (kg)
 const calculateBMI = (height: number, mass: number): number => {
@@ -38,22 +38,32 @@ const parseArgs = (args: string[]): { height: number; mass: number } => {
   if (isNotNumber([args[2], args[3]])) {
     throw new Error("Provided values were not numbers!");
   }
-  
+
   return {
     height: Number(args[2]),
     mass: Number(args[3]),
   };
 };
 
-try {
-  const { height, mass } = parseArgs(process.argv);
-  const BMI = calculateBMI(height, mass);
-  console.log("BMI:", BMI.toFixed(2), "| Classification:", classifyBMI(BMI));
-} catch (error: unknown) {
-  let errorMessage = "";
-  if (error instanceof Error) {
-    errorMessage += "Error: " + error.message;
+const main = () => {
+  try {
+    const { height, mass } = parseArgs(process.argv);
+    const BMI = calculateBMI(height, mass);
+    console.log("BMI:", BMI.toFixed(2), "| Classification:", classifyBMI(BMI));
+  } catch (error: unknown) {
+    let errorMessage = "";
+    if (error instanceof Error) {
+      errorMessage += "Error: " + error.message;
+    }
+    errorMessage += `\nUsage: ts-node ${currentFileName} <height (in cm)> <mass (in kg)>`;
+    console.error(errorMessage);
   }
-  errorMessage += `\nUsage: ts-node ${currentFileName} <height (in cm)> <mass (in kg)>`;
-  console.error(errorMessage);
 }
+
+if(require.main === module) {
+  main();
+}
+
+export default (height: number, weight: number): Classification => {
+  return classifyBMI(calculateBMI(height, weight));
+};
