@@ -58,9 +58,9 @@ const main = () => {
     errorMessage += `\nUsage: ts-node ${currentFileName} <height (in cm)> <mass (in kg)>`;
     console.error(errorMessage);
   }
-}
+};
 
-if(require.main === module) {
+if (require.main === module) {
   main();
 }
 

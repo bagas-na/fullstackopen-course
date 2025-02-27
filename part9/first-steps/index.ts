@@ -1,6 +1,8 @@
-import express, { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import express from "express";
 import calculateBMI from "./bmiCalculator";
+import calculateExercises from "./exerciseCalculator";
 import { isNotNumber } from "./utils/parser";
+
 const app = express();
 
 app.get("/hello", (_req, res) => {
@@ -9,8 +11,8 @@ app.get("/hello", (_req, res) => {
 
 app.get("/bmi", (req, res) => {
   const queries = req.query;
-  const height = queries.height && queries.height.toString();
-  const weight = queries.weight && queries.weight.toString();
+  const height = queries.height && JSON.stringify(queries.height);
+  const weight = queries.weight && JSON.stringify(queries.weight);
 
   if (!height || !weight) {
     throw new Error("malformatted parameters");
@@ -29,6 +31,34 @@ app.get("/bmi", (req, res) => {
   res.json(result);
 });
 
+app.post("/exercises", (req, res) => {
+   
+  interface postBody {
+    target?: number | string;
+    daily_exercises?: unknown;
+  }
+
+  const { target, daily_exercises } = req.body as postBody;
+
+  if (target === undefined || daily_exercises === undefined) {
+    throw new Error("parameters missing");
+  }
+
+  if (isNotNumber(target, daily_exercises)) {
+    throw new Error("malformatted parameters");
+  }
+
+  const targetHour = Number(target);
+  const exercisesArray: number[] = JSON.stringify(daily_exercises)
+    .trim()
+    .split(/[,[\]]/)
+    .filter(Number)
+    .map(Number);
+
+  const result = calculateExercises(targetHour, exercisesArray);
+
+  res.json(result);
+});
 
 const PORT = 3003;
 app.listen(PORT, () => {

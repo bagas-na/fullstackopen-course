@@ -55,15 +55,25 @@ const parseArgs = (args: string[]): { target: number; hours: number[] } => {
   return { target, hours };
 };
 
-try {
-  const { target, hours } = parseArgs(process.argv);
-  const result = evaluateHours(target, hours);
-  console.log(result)
-} catch (error: unknown) {
-  let errorMessage = "";
-  if (error instanceof Error) {
-    errorMessage += "Error: " + error.message;
+const main = () => {
+  try {
+    const { target, hours } = parseArgs(process.argv);
+    const result = evaluateHours(target, hours);
+    console.log(result);
+  } catch (error: unknown) {
+    let errorMessage = "";
+    if (error instanceof Error) {
+      errorMessage += "Error: " + error.message;
+    }
+    errorMessage += `\nUsage: ts-node ${currentFileName} <target (in hours)> <day1 hours> [day hours...]`;
+    console.error(errorMessage);
   }
-  errorMessage += `\nUsage: ts-node ${currentFileName} <target (in hours)> <day1 hours> [day hours...]`;
-  console.error(errorMessage);
+};
+
+if (require.main === module) {
+  main();
 }
+
+export default (target: number, daily_exercises: number[]): Result => {
+  return evaluateHours(target, daily_exercises);
+};
