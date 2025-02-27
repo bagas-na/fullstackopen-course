@@ -4,6 +4,7 @@ import calculateExercises from "./exerciseCalculator";
 import { isNotNumber } from "./utils/parser";
 
 const app = express();
+app.use(express.json());
 
 app.get("/hello", (_req, res) => {
   res.send("Hello Full Stack!");
@@ -52,7 +53,7 @@ app.post("/exercises", (req, res) => {
   const exercisesArray: number[] = JSON.stringify(daily_exercises)
     .trim()
     .split(/[,[\]]/)
-    .filter(Number)
+    .filter(s => s.length > 0 && !isNotNumber(s))
     .map(Number);
 
   const result = calculateExercises(targetHour, exercisesArray);
