@@ -1,5 +1,5 @@
 import path from "path";
-import { isNotNumber } from "./utils/parser.ts";
+import { isNotNumber } from "./utils/parser";
 
 const currentFileName = path.basename(process.argv[1]);
 
