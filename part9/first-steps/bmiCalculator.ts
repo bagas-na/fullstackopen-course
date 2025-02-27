@@ -1,3 +1,8 @@
+import path from 'path';
+import { isNotNumber } from "./utils/parser.ts";
+
+const currentFileName = path.basename(process.argv[1])
+
 // Calculates BMI (kg/m2) using height (in cm) and mass (kg)
 const calculateBMI = (height: number, mass: number): number => {
   return (mass / height ** 2) * 10000;
@@ -26,29 +31,29 @@ const classifyBMI = (bmi: number): Classification => {
   }
 };
 
-const parseArguments = (args: string[]): { height: number; mass: number } => {
+const parseArgs = (args: string[]): { height: number; mass: number } => {
   if (args.length < 4) throw new Error("Not enough arguments");
   if (args.length > 4) throw new Error("Too many arguments");
 
-  if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
-    return {
-      height: Number(args[2]),
-      mass: Number(args[3]),
-    };
-  } else {
+  if (isNotNumber([args[2], args[3]])) {
     throw new Error("Provided values were not numbers!");
   }
+  
+  return {
+    height: Number(args[2]),
+    mass: Number(args[3]),
+  };
 };
 
 try {
-  const { height, mass } = parseArguments(process.argv);
-  const BMI = calculateBMI(height, mass)
-  console.log('BMI:', BMI.toFixed(2), '| Classification:', classifyBMI(BMI))
+  const { height, mass } = parseArgs(process.argv);
+  const BMI = calculateBMI(height, mass);
+  console.log("BMI:", BMI.toFixed(2), "| Classification:", classifyBMI(BMI));
 } catch (error: unknown) {
   let errorMessage = "";
   if (error instanceof Error) {
     errorMessage += "Error: " + error.message;
   }
-  errorMessage += "\nUsage: ts-node bmiCalculator.ts <height (in cm)> <mass (in kg)>";
+  errorMessage += `\nUsage: ts-node ${currentFileName} <height (in cm)> <mass (in kg)>`;
   console.error(errorMessage);
 }
