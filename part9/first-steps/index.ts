@@ -33,28 +33,30 @@ app.get("/bmi", (req, res) => {
 });
 
 app.post("/exercises", (req, res) => {
-   
   interface postBody {
-    target?: number | string;
+    target?: unknown;
     daily_exercises?: unknown;
   }
 
   const { target, daily_exercises } = req.body as postBody;
 
+  // Ensure received json contains required properties
   if (target === undefined || daily_exercises === undefined) {
     throw new Error("parameters missing");
   }
 
-  if (isNotNumber(target, daily_exercises)) {
+  // Validate type of "target" to be a number
+  if (typeof target !== "number" || isNaN(Number(target))) {
+    throw new Error ("malformatted parameters");
+  }
+
+  // Validate type of "daily_exercises" to be number[]
+  if (!Array.isArray(daily_exercises) || isNotNumber(daily_exercises)) {
     throw new Error("malformatted parameters");
   }
 
   const targetHour = Number(target);
-  const exercisesArray: number[] = JSON.stringify(daily_exercises)
-    .trim()
-    .split(/[,[\]]/)
-    .filter(s => s.length > 0 && !isNotNumber(s))
-    .map(Number);
+  const exercisesArray = daily_exercises.map(Number);
 
   const result = calculateExercises(targetHour, exercisesArray);
 
